@@ -1,3 +1,4 @@
+import 'package:fintrack/components/headers/default_header.dart';
 import 'package:flutter/material.dart';
 import 'screens/splash.dart';
 import 'screens/home.dart';
@@ -9,14 +10,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'FinTrack',
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/home': (context) => const HomePage(),
-      },
+    return MaterialApp(debugShowCheckedModeBanner: false, home: HomePage());
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Column(
+        children: [
+          DefaultHeader(
+            title: "Bem vindo",
+            subtitle: "Bom Dia",
+            isBackButtonVisible: false,
+          ),
+          SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }
