@@ -12,7 +12,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 5), () {
       Navigator.of(context).pushReplacementNamed('/home');
     });
   }
@@ -20,21 +20,19 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF00D09C), // cor da imagem
+      backgroundColor: const Color(0xFF00D09C),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/images/logo-splash.png', width: 120),
-            const SizedBox(height: 16),
-            const Text(
-              'FinTrack',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+            SizedBox(
+              width: 500,
+              height: 500,
+              child: Image.asset(
+                'assets/images/logo-splash.png',
+                fit: BoxFit.contain,
               ),
-            )
+            ),
           ],
         ),
       ),
