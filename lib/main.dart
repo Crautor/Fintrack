@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/splash.dart';
-import 'screens/home.dart';
+import 'routes/app.routes.dart';
 
 void main() => runApp(const MyApp());
 
@@ -12,11 +11,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'FinTrack',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/home': (context) => const HomePage(),
-      },
+      initialRoute: AppRoutes.splash,
+      routes: AppRoutes.routes,
     );
   }
 }
