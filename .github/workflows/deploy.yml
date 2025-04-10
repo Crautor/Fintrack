@@ -8,30 +8,39 @@ on:
 
 jobs:
   deploy:
-    name: Docker container with Ngrok tunnel
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      
-      - name: Install Docker Compose
+
+      - name: Set up Docker Compose
         run: |
           sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version
-      
-      - name: Run container
-        run: docker-compose up -d 
-      
-      - name: Ngrok Tunnel
-        uses: luisboto/ngrok-tunnel-action@v0.1.7.2
-        with:
-          timeout: 1h
-          port: 8000
-          ngrok_authtoken: ${{ secrets.NGROK_AUTHTOKEN }}
-          tunnel_type: http
-          save_url_to_filename: tunnelURL.md
+
+      - name: Run containers
+        run: docker-compose up -d
+
+      - name: Install ngrok (v3)
+        run: |
+          curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
+          sudo apt update && sudo apt install ngrok
+
+      - name: Authenticate ngrok
+        run: ngrok config add-authtoken ${{ secrets.NGROK_AUTHTOKEN }}
+
+      - name: Start ngrok tunnel
+        run: |
+          nohup ngrok http 8000 > ngrok.log &
+          sleep 5
+          curl http://127.0.0.1:4040/api/tunnels
+
+      - name: Get public URL
+        id: get-url
+        run: |
+          echo "TUNNEL_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url')" >> $GITHUB_ENV
+
+      - name: Print tunnel URL
+        run: echo "Public URL: $TUNNEL_URL"
