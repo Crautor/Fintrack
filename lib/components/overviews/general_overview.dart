@@ -26,7 +26,7 @@ class GeneralOverview extends StatelessWidget {
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.show_chart, size: 16, color: Colors.black),
+                      Icon(Icons.trending_up, size: 16, color: Colors.black),
                       SizedBox(width: 4),
                       Text(
                         "Total Balance",
@@ -58,11 +58,7 @@ class GeneralOverview extends StatelessWidget {
                 children: [
                   const Row(
                     children: [
-                      Icon(
-                        Icons.waterfall_chart,
-                        size: 16,
-                        color: Colors.black,
-                      ),
+                      Icon(Icons.trending_down, size: 16, color: Colors.black),
                       SizedBox(width: 4),
                       Text(
                         "Total Expense",

@@ -1,12 +1,19 @@
 import 'package:fintrack/components/headers/default_header.dart';
 import 'package:fintrack/components/overviews/general_overview.dart';
 import 'package:fintrack/components/overviews/last_week_overview.dart';
+import 'package:fintrack/components/tables/transaction_section.dart';
+import 'package:fintrack/models/transaction_item_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   void _navigate(BuildContext context, int index) {
     const routes = [
       '/home',
@@ -45,6 +52,7 @@ class HomePage extends StatelessWidget {
 
   final Color mainGreen = const Color(0xFF00D084);
   final Color lightGreen = const Color(0xFFDAF7E9);
+  int selectedToggleIndex = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -148,99 +156,54 @@ class HomePage extends StatelessWidget {
                 children: [
                   const SizedBox(height: 20),
                   LastWeekOverview(
-                    backgroundColor: Color(0xFFDAF7E9),
                     revenue: 4000.00,
                     expense: 100.00,
+                    goalPercentage: 0.5,
                   ),
                   const SizedBox(height: 20),
-                  ToggleButtons(
-                    isSelected: [false, false, true],
-                    onPressed: (_) {},
-                    borderRadius: BorderRadius.circular(10),
-                    selectedColor: Colors.white,
-                    fillColor: mainGreen,
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text("Daily"),
+                  TransactionSection(
+                    toggleLabels: ["Daily", "Weekly", "Monthly"],
+                    isSelected: List.generate(
+                      3,
+                      (index) => index == selectedToggleIndex,
+                    ),
+                    onToggle: (index) {
+                      print("Selected index: $index");
+                      setState(() {
+                        selectedToggleIndex = index;
+                      });
+                    },
+                    transactions: [
+                      TransactionItemData(
+                        icon: Icons.payments,
+                        label: "Salary",
+                        time: "18:27 - April 30",
+                        category: "Monthly",
+                        amount: "\$4,000.00",
+                        amountColor: Colors.black,
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text("Weekly"),
+                      TransactionItemData(
+                        icon: Icons.shopping_cart,
+                        label: "Groceries",
+                        time: "17:00 - April 24",
+                        category: "Pantry",
+                        amount: "-\$100.00",
+                        amountColor: Colors.blue,
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text("Monthly"),
+                      TransactionItemData(
+                        icon: Icons.home,
+                        label: "Rent",
+                        time: "8:30 - April 15",
+                        category: "Rent",
+                        amount: "-\$674.40",
+                        amountColor: Colors.blue,
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 20),
-                  const TransactionTile(
-                    icon: Icons.payments,
-                    label: "Salary",
-                    time: "18:27 - April 30",
-                    category: "Monthly",
-                    amount: "\$4,000.00",
-                    amountColor: Colors.black,
-                  ),
-                  const TransactionTile(
-                    icon: Icons.shopping_cart,
-                    label: "Groceries",
-                    time: "17:00 - April 24",
-                    category: "Pantry",
-                    amount: "-\$100.00",
-                    amountColor: Colors.blue,
-                  ),
-                  const TransactionTile(
-                    icon: Icons.home,
-                    label: "Rent",
-                    time: "8:30 - April 15",
-                    category: "Rent",
-                    amount: "-\$674.40",
-                    amountColor: Colors.blue,
                   ),
                 ],
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class TransactionTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String time;
-  final String category;
-  final String amount;
-  final Color amountColor;
-
-  const TransactionTile({
-    required this.icon,
-    required this.label,
-    required this.time,
-    required this.category,
-    required this.amount,
-    required this.amountColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: Colors.blue.shade100,
-        child: Icon(icon, color: Colors.blue),
-      ),
-      title: Text(label),
-      subtitle: Text("$time • $category"),
-      trailing: Text(
-        amount,
-        style: TextStyle(
-          color: amountColor,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
         ),
       ),
     );
