@@ -71,8 +71,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 0),
                   TextButton(
-                     onPressed:
-                        () => Navigator.pushNamed(context, AppRoutes.forgotPassword),
+                    onPressed:
+                        () => Navigator.pushNamed(
+                          context,
+                          AppRoutes.forgotPassword,
+                        ),
                     child: const Text(
                       'Esqueceu a senha?',
                       style: TextStyle(
@@ -83,7 +86,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   const SizedBox(height: 48),
-                  PrimaryButton(text: 'Entrar', onPressed: () {}),
+                  PrimaryButton(
+                    text: 'Entrar',
+                    onPressed:
+                        () => Navigator.pushNamed(context, AppRoutes.home),
+                  ), // trocar depois para autenticar usuario
 
                   const SizedBox(height: 24),
                   SecondaryButton(
@@ -95,7 +102,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 24),
                   Center(
                     child: GestureDetector(
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.register),
+                      onTap:
+                          () =>
+                              Navigator.pushNamed(context, AppRoutes.register),
                       child: const Text.rich(
                         TextSpan(
                           text: 'Não possui uma conta? ',
