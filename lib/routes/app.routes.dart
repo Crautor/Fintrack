@@ -8,6 +8,11 @@ import '../screens/Auth/forgot_password.dart';
 import '../screens/Auth/verification_code.dart';
 import '../screens/Auth/new_password.dart';
 import '../screens/Auth/password_sucess.dart';
+import '../screens/dashboard.dart';
+import '../screens/transactions.dart';
+import '../screens/profile.dart';
+import '../screens/categories.dart';
+
 
 class AppRoutes {
   static const String splash = '/';
@@ -19,18 +24,26 @@ class AppRoutes {
   static const String verificationCode = '/verify';
   static const String newPassword = '/new-password';
   static const String passwordSuccess = '/password-success';
+  static const String dashboard = '/dashboard';
+  static const String transactions = '/transactions';
+  static const String profile = '/profile';
+  static const String categories = '/categories';
+
 
 
   static final Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
     prelogin: (context) => const PreLoginScreen(),
     home: (context) => const HomePage(),
+    dashboard: (context) => const DashboardPage(),
+    transactions: (context) => const TransactionsPage(),
+    profile: (context) => const ProfilePage(),
+    categories: (context) => const CategoriesPage(),
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
     forgotPassword: (context) => const ForgotPasswordScreen(),
     verificationCode: (context) => const VerificationCodeScreen(),
     newPassword: (context) => const NewPasswordScreen(),
     passwordSuccess: (context) => const PasswordSuccessScreen()
-
   };
 }
