@@ -34,7 +34,7 @@ jobs:
       - name: Start ngrok tunnel
         run: |
           nohup ngrok http 8000 > ngrok.log 2>&1 &
-          sleep 5
+          sleep 10
 
       - name: Get public URL
         id: get-url
@@ -43,3 +43,6 @@ jobs:
 
       - name: Print tunnel URL
         run: echo "Public URL is $TUNNEL_URL"
+
+      - name: Keep job alive for 15 minutes
+        run: sleep 900
