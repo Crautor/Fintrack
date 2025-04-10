@@ -83,7 +83,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   const SizedBox(height: 48),
-                  PrimaryButton(text: 'Entrar', onPressed: () {}),
+                  PrimaryButton(text: 'Entrar', onPressed: () {
+                    Navigator.pushReplacementNamed(context, AppRoutes.home);
+                  }),
 
                   const SizedBox(height: 24),
                   SecondaryButton(
