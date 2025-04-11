@@ -4,7 +4,6 @@ import 'package:fintrack/components/overviews/last_week_overview.dart';
 import 'package:fintrack/components/tables/transaction_section.dart';
 import 'package:fintrack/models/transaction_item_data.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -53,6 +52,75 @@ class _HomePageState extends State<HomePage> {
   final Color mainGreen = const Color(0xFF00D084);
   final Color lightGreen = const Color(0xFFDAF7E9);
   int selectedToggleIndex = 2;
+
+  final List<TransactionItemData> dailyTransactions = [
+    TransactionItemData(
+      icon: Icons.coffee,
+      label: "Coffee",
+      time: "08:30 - April 10",
+      category: "Food",
+      amount: "-\$4.50",
+      amountColor: Colors.blue,
+    ),
+    TransactionItemData(
+      icon: Icons.bus_alert,
+      label: "Bus",
+      time: "09:00 - April 10",
+      category: "Transport",
+      amount: "-\$3.20",
+      amountColor: Colors.blue,
+    ),
+  ];
+
+  final List<TransactionItemData> weeklyTransactions = [
+    TransactionItemData(
+      icon: Icons.shopping_cart,
+      label: "Supermarket",
+      time: "17:00 - April 08",
+      category: "Shopping",
+      amount: "-\$150.00",
+      amountColor: Colors.blue,
+    ),
+    TransactionItemData(
+      icon: Icons.restaurant,
+      label: "Lunch",
+      time: "12:30 - April 07",
+      category: "Restaurant",
+      amount: "-\$25.00",
+      amountColor: Colors.blue,
+    ),
+  ];
+
+  final List<TransactionItemData> monthlyTransactions = [
+    TransactionItemData(
+      icon: Icons.payments,
+      label: "Salary",
+      time: "18:27 - April 01",
+      category: "Revenue",
+      amount: "\$4,000.00",
+      amountColor: Colors.black,
+    ),
+    TransactionItemData(
+      icon: Icons.home,
+      label: "Rent",
+      time: "08:30 - April 05",
+      category: "Fixed Expenses",
+      amount: "-\$674.40",
+      amountColor: Colors.blue,
+    ),
+  ];
+
+  List<TransactionItemData> getSelectedTransactions() {
+    switch (selectedToggleIndex) {
+      case 0:
+        return dailyTransactions;
+      case 1:
+        return weeklyTransactions;
+      case 2:
+      default:
+        return monthlyTransactions;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +195,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             const DefaultHeader(
-              title: 'Hi, Welcome Back',
+              title: 'Hello, Welcome Back',
               subtitle: 'Good Morning',
               isBackButtonVisible: false,
               child: GeneralOverview(
@@ -168,37 +236,11 @@ class _HomePageState extends State<HomePage> {
                       (index) => index == selectedToggleIndex,
                     ),
                     onToggle: (index) {
-                      print("Selected index: $index");
                       setState(() {
                         selectedToggleIndex = index;
                       });
                     },
-                    transactions: [
-                      TransactionItemData(
-                        icon: Icons.payments,
-                        label: "Salary",
-                        time: "18:27 - April 30",
-                        category: "Monthly",
-                        amount: "\$4,000.00",
-                        amountColor: Colors.black,
-                      ),
-                      TransactionItemData(
-                        icon: Icons.shopping_cart,
-                        label: "Groceries",
-                        time: "17:00 - April 24",
-                        category: "Pantry",
-                        amount: "-\$100.00",
-                        amountColor: Colors.blue,
-                      ),
-                      TransactionItemData(
-                        icon: Icons.home,
-                        label: "Rent",
-                        time: "8:30 - April 15",
-                        category: "Rent",
-                        amount: "-\$674.40",
-                        amountColor: Colors.blue,
-                      ),
-                    ],
+                    transactions: getSelectedTransactions(),
                   ),
                 ],
               ),
@@ -209,3 +251,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
