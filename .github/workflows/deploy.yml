@@ -26,7 +26,7 @@ jobs:
       - name: Start SSH tunnel
         run: |
           ssh -p 443 -R0:localhost:8000 -L4300:localhost:4300 -o StrictHostKeyChecking=no -o ServerAliveInterval=30 4oDLH7Oqvhf@free.pinggy.io
-
+ 
 
       - name: Keep job alive for 15 minutes
         run: sleep 900
