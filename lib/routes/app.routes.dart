@@ -1,4 +1,5 @@
 import 'package:fintrack/screens/Auth/login.dart';
+import '../screens/Auth/terms_and_conditions.dart';
 import 'package:flutter/material.dart';
 import '../screens/home.dart';
 import '../screens/Launch/pre_login.dart';
@@ -15,6 +16,7 @@ import '../screens/categories.dart';
 class AppRoutes {
   static const String prelogin = '/prelogin';
   static const String home = '/home';
+  static const String termsAndConditions = '/terms-and-conditions';
   static const String login = '/login';
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
@@ -29,6 +31,7 @@ class AppRoutes {
   static final Map<String, WidgetBuilder> routes = {
     prelogin: (context) => const PreLoginScreen(),
     home: (context) => const HomePage(),
+    termsAndConditions: (context) => const TermsAndConditionsScreen(),
     dashboard: (context) => const DashboardPage(),
     transactions: (context) => const TransactionsPage(),
     profile: (context) => const ProfilePage(),
