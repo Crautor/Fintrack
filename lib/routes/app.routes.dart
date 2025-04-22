@@ -1,7 +1,6 @@
 import 'package:fintrack/screens/Auth/login.dart';
 import 'package:flutter/material.dart';
 import '../screens/home.dart';
-import '../screens/Launch/splash.dart';
 import '../screens/Launch/pre_login.dart';
 import '../screens/Auth/register.dart';
 import '../screens/Auth/forgot_password.dart';
@@ -14,7 +13,6 @@ import '../screens/profile.dart';
 import '../screens/categories.dart';
 
 class AppRoutes {
-  static const String splash = '/';
   static const String prelogin = '/prelogin';
   static const String home = '/home';
   static const String login = '/login';
@@ -28,10 +26,7 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String categories = '/categories';
 
-
-
   static final Map<String, WidgetBuilder> routes = {
-    splash: (context) => const SplashScreen(),
     prelogin: (context) => const PreLoginScreen(),
     home: (context) => const HomePage(),
     dashboard: (context) => const DashboardPage(),
@@ -43,6 +38,6 @@ class AppRoutes {
     forgotPassword: (context) => const ForgotPasswordScreen(),
     verificationCode: (context) => const VerificationCodeScreen(),
     newPassword: (context) => const NewPasswordScreen(),
-    passwordSuccess: (context) => const PasswordSuccessScreen()
+    passwordSuccess: (context) => const PasswordSuccessScreen(),
   };
 }

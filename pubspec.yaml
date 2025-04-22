@@ -46,6 +46,16 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  flutter_native_splash: ^2.4.0
+
+# RODAR COMANDO ABAIXO PARA GERAR A SPLASH SCREEN
+# flutter pub run flutter_native_splash:create
+flutter_native_splash:
+  color: "#00D09C"
+  image: assets/images/logo-splash.png
+  fullscreen: true
+  android: true
+  ios: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
