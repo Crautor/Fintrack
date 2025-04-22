@@ -89,7 +89,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   PrimaryButton(
                     text: 'Entrar',
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, AppRoutes.home);
+                      Navigator.pushReplacementNamed(
+                        context,
+                        AppRoutes.termsAndConditions,
+                      );
                     },
                   ),
 
