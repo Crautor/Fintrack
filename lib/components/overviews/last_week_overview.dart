@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class LastWeekOverview extends StatelessWidget {
   final double revenue;
   final double expense;
-  final double goalPercentage; // Novo atributo
+  final double goalPercentage;
 
   const LastWeekOverview({
     super.key,
