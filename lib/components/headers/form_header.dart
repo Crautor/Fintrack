@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 class FormHeader extends StatelessWidget {
   final String title;
   final VoidCallback? onBack;
-  final VoidCallback? onNotification;
 
   const FormHeader({
     super.key,
     required this.title,
     this.onBack,
-    this.onNotification,
   });
 
   @override
@@ -25,7 +23,7 @@ class FormHeader extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+         padding: const EdgeInsets.fromLTRB(20, 11, 20, 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -53,7 +51,7 @@ class FormHeader extends StatelessWidget {
                     Icons.notifications_none,
                     color: Color(0xFF093030),
                   ),
-                  onPressed: onNotification ?? () {},
+                  onPressed: () => {},
                   splashRadius: 20,
                 ),
               ),

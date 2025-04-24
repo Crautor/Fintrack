@@ -28,16 +28,17 @@ class TransactionsHeader extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          padding: const EdgeInsets.fromLTRB(20, 11, 20, 20),
           child: Column(
             children: [
-              // Top bar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, '/main');
+                    },
                   ),
                   const Text(
                     'Transações',
@@ -56,10 +57,10 @@ class TransactionsHeader extends StatelessWidget {
                     ),
                     child: IconButton(
                       icon: const Icon(
-                        Icons.person_outline,
+                        Icons.notifications_none,
                         color: Color(0xFF093030),
                       ),
-                      onPressed: () {},
+                      onPressed: () => {},
                       splashRadius: 20,
                     ),
                   ),
