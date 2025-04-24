@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 
 class CustomNavBar extends StatelessWidget {
   final int currentIndex;
+  final ValueChanged<int> onTap;
 
-  const CustomNavBar({super.key, required this.currentIndex});
+  const CustomNavBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
-  void _navigate(BuildContext context, int index) {
-    const routes = [
-      '/home',
-      '/dashboard',
-      '/transactions',
-      '/categories',
-      '/profile',
-    ];
-
-    if (ModalRoute.of(context)?.settings.name != routes[index]) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        routes[index],
-        (route) => false,
-      );
-    }
+  Widget _buildIcon(String asset, int index) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color:
+            currentIndex == index
+                ? const Color(0xFF00D09E)
+                : Colors.transparent,
+        shape: BoxShape.circle,
+      ),
+      child: Image.asset(asset, width: 24, height: 24),
+    );
   }
 
   @override
@@ -33,16 +33,11 @@ class CustomNavBar extends StatelessWidget {
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
       ),
       child: BottomNavigationBar(
         currentIndex: currentIndex,
-        onTap: (index) => _navigate(context, index),
+        onTap: onTap, // agora só controla o índice da aba
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -52,43 +47,23 @@ class CustomNavBar extends StatelessWidget {
         showUnselectedLabels: false,
         items: [
           BottomNavigationBarItem(
-            icon: Image.asset(
-                'assets/images/home_icon.png',
-                width: 24,
-                height: 24,
-            ),
+            icon: _buildIcon('assets/images/home_icon.png', 0),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/images/dashboard_icon.png',
-              width: 24,
-              height: 24,
-            ),
+            icon: _buildIcon('assets/images/dashboard_icon.png', 1),
             label: 'Dashboard',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/images/transactions_icon.png',
-              width: 24,
-              height: 24,
-            ),
+            icon: _buildIcon('assets/images/transactions_icon.png', 2),
             label: 'Transações',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/images/categories_icon.png',
-              width: 24,
-              height: 24,
-            ),
+            icon: _buildIcon('assets/images/categories_icon.png', 3),
             label: 'Categorias',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/images/profile_icon.png',
-              width: 24,
-              height: 24,
-            ),
+            icon: _buildIcon('assets/images/profile_icon.png', 4),
             label: 'Perfil',
           ),
         ],

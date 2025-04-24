@@ -91,7 +91,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                   PrimaryButton(
                     text: 'Verificar',
                     onPressed: () {
-                      print('Código inserido: $_code');
+                     //fazer aqui a logica do codigo
                        Navigator.pushNamed(context, AppRoutes.newPassword);
                     },
                   ),

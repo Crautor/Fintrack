@@ -1,4 +1,6 @@
 import 'package:fintrack/screens/Auth/login.dart';
+import 'package:fintrack/screens/Categories/categories.dart';
+import 'package:fintrack/screens/Categories/expense_add.dart';
 import '../screens/Auth/terms_and_conditions.dart';
 import 'package:flutter/material.dart';
 import '../screens/home.dart';
@@ -11,7 +13,7 @@ import '../screens/Auth/password_sucess.dart';
 import '../screens/dashboard.dart';
 import '../screens/transactions.dart';
 import '../screens/profile.dart';
-import '../screens/categories.dart';
+import '../components/layout/main_screen.dart'; 
 
 class AppRoutes {
   static const String prelogin = '/prelogin';
@@ -27,6 +29,8 @@ class AppRoutes {
   static const String transactions = '/transactions';
   static const String profile = '/profile';
   static const String categories = '/categories';
+  static const String addExpense = '/add';
+  static const String main = '/main'; 
 
   static final Map<String, WidgetBuilder> routes = {
     prelogin: (context) => const PreLoginScreen(),
@@ -36,11 +40,13 @@ class AppRoutes {
     transactions: (context) => const TransactionsPage(),
     profile: (context) => const ProfilePage(),
     categories: (context) => const CategoriesPage(),
+    addExpense: (context) => const AddExpenseScreen(),
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
     forgotPassword: (context) => const ForgotPasswordScreen(),
     verificationCode: (context) => const VerificationCodeScreen(),
     newPassword: (context) => const NewPasswordScreen(),
     passwordSuccess: (context) => const PasswordSuccessScreen(),
+    main: (context) => const MainScreen(),
   };
 }

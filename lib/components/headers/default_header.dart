@@ -81,18 +81,19 @@ class DefaultHeader extends StatelessWidget {
                     ),
                   ),
                   Container(
+                    width: 40,
+                    height: 40,
                     decoration: const BoxDecoration(
-                      color: Color(0xFFDFF7E2),
+                      color: Colors.white,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       icon: const Icon(
-                        Icons.notifications,
+                        Icons.notifications_none,
                         color: Color(0xFF093030),
                       ),
-                      onPressed: () {
-                        // notificações
-                      },
+                      onPressed: () => {},
+                      splashRadius: 20,
                     ),
                   ),
                 ],
