@@ -92,6 +92,7 @@ class DefaultHeader extends StatelessWidget {
                       ),
                       onPressed: () {
                         // notificações
+                        Navigator.pushNamed(context, '/notifications');
                       },
                     ),
                   ),

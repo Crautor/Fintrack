@@ -12,6 +12,7 @@ import '../screens/dashboard.dart';
 import '../screens/transactions.dart';
 import '../screens/profile.dart';
 import '../screens/categories.dart';
+import '../screens/notifications.dart';
 
 class AppRoutes {
   static const String prelogin = '/prelogin';
@@ -27,6 +28,7 @@ class AppRoutes {
   static const String transactions = '/transactions';
   static const String profile = '/profile';
   static const String categories = '/categories';
+  static const String notifications = '/notifications';
 
   static final Map<String, WidgetBuilder> routes = {
     prelogin: (context) => const PreLoginScreen(),
@@ -42,5 +44,6 @@ class AppRoutes {
     verificationCode: (context) => const VerificationCodeScreen(),
     newPassword: (context) => const NewPasswordScreen(),
     passwordSuccess: (context) => const PasswordSuccessScreen(),
+    notifications: (context) => const NotificationsPage(),
   };
 }

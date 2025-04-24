@@ -26,7 +26,16 @@ class CustomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final iconPaths = [
+      'assets/images/home_icon.png',
+      'assets/images/dashboard_icon.png',
+      'assets/images/transactions_icon.png',
+      'assets/images/categories_icon.png',
+      'assets/images/profile_icon.png',
+    ];
+
     return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: const BoxDecoration(
         color: Color(0xFFE9FFF9),
         borderRadius: BorderRadius.only(
@@ -40,59 +49,28 @@ class CustomNavBar extends StatelessWidget {
           ),
         ],
       ),
-      child: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (index) => _navigate(context, index),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        selectedItemColor: Colors.teal[800],
-        unselectedItemColor: Colors.grey[600],
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset(
-                'assets/images/home_icon.png',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(5, (index) {
+          final isSelected = index == currentIndex;
+
+          return IconButton(
+            onPressed: () => _navigate(context, index),
+            icon: ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                isSelected ? Colors.teal[800]! : Colors.grey[600]!,
+                BlendMode.srcIn,
+              ),
+              child: Image.asset(
+                iconPaths[index],
                 width: 24,
                 height: 24,
+              ),
             ),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/images/dashboard_icon.png',
-              width: 24,
-              height: 24,
-            ),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/images/transactions_icon.png',
-              width: 24,
-              height: 24,
-            ),
-            label: 'Transações',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/images/categories_icon.png',
-              width: 24,
-              height: 24,
-            ),
-            label: 'Categorias',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/images/profile_icon.png',
-              width: 24,
-              height: 24,
-            ),
-            label: 'Perfil',
-          ),
-        ],
+          );
+        }),
       ),
     );
   }
 }
+
