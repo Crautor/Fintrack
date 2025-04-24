@@ -1,4 +1,3 @@
-import 'package:fintrack/screens/Categories/expense_add.dart';
 import 'package:flutter/material.dart';
 
 class CategoriesPage extends StatelessWidget {

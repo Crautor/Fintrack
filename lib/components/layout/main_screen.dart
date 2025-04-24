@@ -5,8 +5,6 @@ import 'package:fintrack/components/custom_nav_bar.dart';
 import 'package:fintrack/screens/home.dart';
 import 'package:fintrack/screens/dashboard.dart';
 import 'package:fintrack/screens/Transactions/transiction.dart';
-import 'package:fintrack/screens/Categories/categories.dart';
-import 'package:fintrack/screens/Categories/expense_add.dart';
 import 'package:fintrack/screens/profile.dart';
 
 class MainScreen extends StatefulWidget {
