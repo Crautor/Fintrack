@@ -35,7 +35,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     }
 
     // Aqui entraria a lógica para enviar a nova senha ao backend
-    print('Nova senha definida: $newPassword');
+  
     Navigator.pushReplacementNamed(context, AppRoutes.passwordSuccess);
 
     // Depois de sucesso, pode redirecionar ou mostrar uma mensagem

@@ -94,7 +94,7 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                     text: 'Continuar',
                     onPressed: () {
                       if (_isAccepted) {
-                        Navigator.pushReplacementNamed(context, AppRoutes.home);
+                        Navigator.pushReplacementNamed(context, AppRoutes.main);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
