@@ -88,9 +88,19 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
+      body: Container(
+        height: screenHeight,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Color(0xFFDAF7E9)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         child: Column(
           children: [
             const DefaultHeader(
@@ -104,44 +114,36 @@ class _HomePageState extends State<HomePage> {
                 percentage: 0.3,
               ),
             ),
-            Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.white, Color(0xFFDAF7E9)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
-              ),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  LastWeekOverview(
-                    revenue: 4000.00,
-                    expense: 100.00,
-                    goalPercentage: 0.5,
-                  ),
-                  const SizedBox(height: 20),
-                  TransactionSection(
-                    toggleLabels: ["Daily", "Weekly", "Monthly"],
-                    isSelected: List.generate(
-                      3,
-                      (index) => index == selectedToggleIndex,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    LastWeekOverview(
+                      revenue: 4000.00,
+                      expense: 100.00,
+                      goalPercentage: 0.5,
                     ),
-                    onToggle: (index) {
-                      setState(() {
-                        selectedToggleIndex = index;
-                      });
-                    },
-                    transactions: getSelectedTransactions(),
-                  ),
-                ],
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: TransactionSection(
+                        toggleLabels: ["Daily", "Weekly", "Monthly"],
+                        isSelected: List.generate(
+                          3,
+                          (index) => index == selectedToggleIndex,
+                        ),
+                        onToggle: (index) {
+                          setState(() {
+                            selectedToggleIndex = index;
+                          });
+                        },
+                        transactions: getSelectedTransactions(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

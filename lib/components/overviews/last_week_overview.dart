@@ -31,7 +31,7 @@ class LastWeekOverview extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     SizedBox(
-                      width: 60,
+                      width: 56,
                       height: 60,
                       child: CircularProgressIndicator(
                         value: goalPercentage.clamp(0.0, 1.0),

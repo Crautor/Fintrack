@@ -1,6 +1,7 @@
-import 'package:fintrack/components/tables/transaction_tile.dart';
-import 'package:fintrack/models/transaction_item_data.dart';
+import 'package:fintrack/components/tables/transaction_item_data_mapper.dart';
 import 'package:flutter/material.dart';
+import 'package:fintrack/models/transaction_item_data.dart';
+import 'package:fintrack/components/cards/transactions/transaction_card.dart';
 
 class TransactionSection extends StatelessWidget {
   final List<String> toggleLabels;
@@ -29,7 +30,7 @@ class TransactionSection extends StatelessWidget {
             selectedColor: Colors.white,
             fillColor: const Color(0xFF00D084),
             color: Colors.black87,
-            constraints: const BoxConstraints(minWidth: 120, minHeight: 40),
+            constraints: const BoxConstraints(minWidth: 110, minHeight: 40),
             children:
                 toggleLabels
                     .map(
@@ -40,7 +41,12 @@ class TransactionSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        ...transactions.map((tx) => TransactionTile(data: tx)).toList(),
+        ...transactions.map(
+          (tx) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TransactionCard(item: tx.toTransactionItem()),
+          ),
+        ),
       ],
     );
   }
