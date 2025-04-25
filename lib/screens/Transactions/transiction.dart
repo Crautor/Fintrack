@@ -2,6 +2,7 @@ import 'package:fintrack/components/cards/transactions/transaction_card.dart';
 import 'package:fintrack/components/headers/transactions_header.dart';
 import 'package:fintrack/models/Transaction/list_transaction.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
@@ -12,6 +13,7 @@ class TransactionsScreen extends StatefulWidget {
 
 class _TransactionsScreenState extends State<TransactionsScreen> {
   String? selectedFilter;
+  DateTime? selectedDate;
 
   final Map<String, List<TransactionItem>> groupedTransactions = {
     'April': [
@@ -61,6 +63,38 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     ],
   };
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? now,
+      firstDate: DateTime(now.year - 5),
+      lastDate: DateTime(now.year + 5),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF00D09E),
+              onPrimary: Colors.white,
+              onSurface: Color(0xFF093030),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: Color(0xFF00D09E)),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+        print('Data selecionada: ${DateFormat('dd/MM/yyyy').format(picked)}');
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,11 +109,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             selectedFilter: selectedFilter,
             onFilterChanged: (filter) {
               setState(() {
-                if (selectedFilter == filter) {
-                  selectedFilter = null; 
-                } else {
-                  selectedFilter = filter; 
-                }
+                selectedFilter = selectedFilter == filter ? null : filter;
               });
             },
           ),
@@ -93,33 +123,74 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   topRight: Radius.circular(50),
                 ),
               ),
-              padding: const EdgeInsets.all(20),
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                children:
-                    groupedTransactions.entries.map((entry) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            entry.key,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF0E3E3E),
-                            ),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDFF7E2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(
+                            Icons.calendar_month,
+                            size: 18,
+                            color: Color(0xFF093030),
                           ),
-                          const SizedBox(height: 12),
-                          ...entry.value.map(
-                            (item) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: TransactionCard(item: item),
-                            ),
+                          onPressed: () => _selectDate(context),
+                          splashRadius: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      if (selectedDate != null)
+                        Text(
+                          DateFormat('dd/MM/yyyy').format(selectedDate!),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF0E3E3E),
                           ),
-                          const SizedBox(height: 24),
-                        ],
-                      );
-                    }).toList(),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.only(top: 0),
+                      children:
+                          groupedTransactions.entries.map((entry) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  entry.key,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF0E3E3E),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                ...entry.value.map(
+                                  (item) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                    ),
+                                    child: TransactionCard(item: item),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                              ],
+                            );
+                          }).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
