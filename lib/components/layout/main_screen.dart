@@ -1,4 +1,3 @@
-// main_screen.dart
 import 'package:fintrack/components/layout/CategoriesTab/categories_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:fintrack/components/custom_nav_bar.dart';
@@ -10,14 +9,14 @@ import 'package:fintrack/screens/profile.dart';
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
-  static _MainScreenState? of(BuildContext context) =>
-      context.findAncestorStateOfType<_MainScreenState>();
+  static MainScreenState? of(BuildContext context) =>
+      context.findAncestorStateOfType<MainScreenState>();
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<MainScreen> createState() => MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
   List<Widget> _buildPages() {
