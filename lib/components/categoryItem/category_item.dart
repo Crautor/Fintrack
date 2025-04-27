@@ -19,20 +19,32 @@ class CategoryItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Column(
+        mainAxisSize: MainAxisSize.min, 
         children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF0075FF) : const Color(0xFFB2D8FF),
-              borderRadius: BorderRadius.circular(20),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color:
+                    isSelected
+                        ? const Color(0xFF0075FF)
+                        : const Color(0xFFB2D8FF),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 36, 
+                ),
+              ),
             ),
-            child: Icon(icon, color: Colors.white, size: 30),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
             label,
             style: const TextStyle(fontWeight: FontWeight.w500),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
