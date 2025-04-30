@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fintrack/screens/notification_page.dart';
 
 class DefaultHeader extends StatelessWidget {
   final String title;
@@ -92,7 +93,9 @@ class DefaultHeader extends StatelessWidget {
                         Icons.notifications_none,
                         color: Color(0xFF093030),
                       ),
-                      onPressed: () => {},
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/notifications');
+                      },
                       splashRadius: 20,
                     ),
                   ),
