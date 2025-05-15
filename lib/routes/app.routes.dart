@@ -15,6 +15,7 @@ import '../screens/transactions.dart';
 import '../screens/profile.dart';
 import '../components/layout/main_screen.dart';
 import '../screens/notification_page.dart';
+import 'package:fintrack/screens/Categories/category_detail.dart';
 
 class AppRoutes {
   static const String prelogin = '/prelogin';
@@ -31,8 +32,9 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String categories = '/categories';
   static const String addExpense = '/add';
-  static const String main = '/main'; 
+  static const String main = '/main';
   static const String notifications = '/notifications';
+  static const String categoryDetail = '/category-detail';
 
   static final Map<String, WidgetBuilder> routes = {
     prelogin: (context) => const PreLoginScreen(),
@@ -51,5 +53,14 @@ class AppRoutes {
     newPassword: (context) => const NewPasswordScreen(),
     passwordSuccess: (context) => const PasswordSuccessScreen(),
     main: (context) => const MainScreen(),
+    categoryDetail: (context) {
+      final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      return CategoryDetailPage(
+        categoryLabel: args['categoryLabel'],
+        categoryId: args['categoryId'],
+        iconId: args['iconId'],
+      );
+    },
   };
 }
+
