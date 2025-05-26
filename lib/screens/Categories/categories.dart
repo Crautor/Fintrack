@@ -10,23 +10,22 @@ class CategoriesPage extends StatelessWidget {
 
   const CategoriesPage({super.key, this.onAddPressed});
 
-  // Simulando o que viria do backend:
   final List<Map<String, dynamic>> userCategories = const [
-    {"id": 1, "label": "Comida"},
-    {"id": 2, "label": "Transporte"},
-    {"id": 3, "label": "Saúde"},
-    {"id": 4, "label": "Alimentos"},
-    {"id": 5, "label": "Aluguel"},
-    {"id": 6, "label": "Presentes"},
-    {"id": 7, "label": "Poupança"},
-    {"id": 8, "label": "Entretenimento"},
-    {"id": 9, "label": "Compras"},
-    {"id": 10, "label": "Educação"},
-    {"id": 11, "label": "Viagens"},
-    {"id": 12, "label": "Investimentos"},
-    {"id": 13, "label": "Carro"},
-    {"id": 14, "label": "Animais"},
-    {"id": 15, "label": "Tecnologia"},
+    {"id": 1, "label": "Comida", "iconId": 1},
+    {"id": 2, "label": "Transporte", "iconId": 2},
+    {"id": 3, "label": "Saúde", "iconId": 3},
+    {"id": 4, "label": "Alimentos", "iconId": 4},
+    {"id": 5, "label": "Aluguel", "iconId": 5},
+    {"id": 6, "label": "Presentes", "iconId": 6},
+    {"id": 7, "label": "Poupança", "iconId": 7},
+    {"id": 8, "label": "Entretenimento", "iconId": 8},
+    {"id": 9, "label": "Compras", "iconId": 9},
+    {"id": 10, "label": "Educação", "iconId": 10},
+    {"id": 11, "label": "Viagens", "iconId": 11},
+    {"id": 12, "label": "Investimentos", "iconId": 12},
+    {"id": 13, "label": "Carro", "iconId": 13},
+    {"id": 14, "label": "Animais", "iconId": 14},
+    {"id": 15, "label": "Tecnologia", "iconId": 15},
   ];
 
   @override
@@ -66,11 +65,21 @@ class CategoriesPage extends StatelessWidget {
                 children: [
                   ...userCategories.map((category) {
                     final iconData =
-                        getCategoryIconById(category["id"])?.icon ??
-                        Icons.help_outline;
+                        getCategoryIconById(category["id"])?.icon ?? Icons.help_outline;
                     return CategoryItem(
                       icon: iconData,
                       label: category["label"],
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/category-detail',
+                          arguments: {
+                            'categoryLabel': category["label"],
+                            'categoryId': category["id"],
+                            'iconId': category["iconId"],
+                          },
+                        );
+                      },
                     );
                   }).toList(),
                   CategoryItem(
@@ -82,11 +91,9 @@ class CategoriesPage extends StatelessWidget {
                         builder: (context) {
                           return CategoryModal(
                             onSave: (name, icon) {
-                              // Aqui você recebe o nome e o ícone escolhido
                               print(
                                 'Nova categoria criada: $name com ícone ${icon.label}',
                               );
-                              // Aqui você pode adicionar na lista, chamar API etc.
                             },
                           );
                         },
@@ -102,3 +109,4 @@ class CategoriesPage extends StatelessWidget {
     );
   }
 }
+
