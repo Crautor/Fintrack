@@ -6,19 +6,21 @@ import 'package:fintrack/components/texts/form_label.dart';
 import 'package:flutter/material.dart';
 import 'package:fintrack/components/buttons/primary_button.dart';
 import 'package:fintrack/components/headers/form_header.dart';
+import 'package:fintrack/components/buttons/radio_button.dart';
 
-class AddExpenseScreen extends StatefulWidget {
+class AddTransictionsScreen extends StatefulWidget {
   final VoidCallback? onBack;
 
-  const AddExpenseScreen({super.key, this.onBack});
+  const AddTransictionsScreen({super.key, this.onBack});
 
   @override
-  State<AddExpenseScreen> createState() => _AddExpenseScreenState();
+  State<AddTransictionsScreen> createState() => _AddTransictionsScreenState();
 }
 
-class _AddExpenseScreenState extends State<AddExpenseScreen> {
+class _AddTransictionsScreenState extends State<AddTransictionsScreen> {
   DateTime? selectedDate;
   String? selectedCategory;
+  String? recurrence = 'One Time';
 
   final amountController = TextEditingController();
   final titleController = TextEditingController();
@@ -39,7 +41,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            FormHeader(title: 'Add Expenses', onBack: widget.onBack),
+            FormHeader(title: 'Adicionar Transação', onBack: widget.onBack),
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -58,6 +60,24 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      CustomRadioGroup<String>(
+                        label: 'Recorrência',
+                        selectedValue: recurrence,
+                        onChanged: (value) {
+                          setState(() {
+                            recurrence = value;
+                          });
+                        },
+                        options: const [
+                          CustomRadioOption(label: 'Mensal', value: 'Monthly'),
+                          CustomRadioOption(
+                            label: 'Único',
+                            value: 'One Time',
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
                       const FormLabel("Data"),
                       DatePickerField(
                         hintText: 'Selecione a data',
@@ -68,6 +88,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                           });
                         },
                       ),
+
                       const SizedBox(height: 16),
 
                       CustomSelect<String>(
@@ -93,17 +114,31 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
                       const FormLabel("Titulo da Despesa"),
                       CustomTextField(
-                        hintText: 'Informe o título da despesa',
+                        hintText: 'Informe um título',
                         controller: titleController,
                       ),
                       const SizedBox(height: 16),
 
-                      const FormLabel("Mensagem"),
+                      const FormLabel("Descrição"),
                       CustomTextArea(
-                        hintText: 'Digite uma mensagem',
+                        hintText: 'Digite uma mensagem descritiva',
                         controller: messageController,
                       ),
 
+                      const SizedBox(height: 16),
+                      CustomRadioGroup<String>(
+                        label: 'Type',
+                        selectedValue: recurrence,
+                        onChanged: (value) {
+                          setState(() {
+                            recurrence = value;
+                          });
+                        },
+                        options: const [
+                          CustomRadioOption(label: 'Entrada', value: '1'),
+                          CustomRadioOption(label: 'Despesa', value: '2'),
+                        ],
+                      ),
                       const SizedBox(height: 24),
 
                       PrimaryButton(

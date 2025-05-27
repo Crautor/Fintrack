@@ -1,6 +1,6 @@
 import 'package:fintrack/screens/Auth/login.dart';
 import 'package:fintrack/screens/Categories/categories.dart';
-import 'package:fintrack/screens/Categories/expense_add.dart';
+import 'package:fintrack/screens/Categories/transictions_add.dart';
 import '../screens/Auth/terms_and_conditions.dart';
 import 'package:flutter/material.dart';
 import '../screens/home.dart';
@@ -31,7 +31,7 @@ class AppRoutes {
   static const String transactions = '/transactions';
   static const String profile = '/profile';
   static const String categories = '/categories';
-  static const String addExpense = '/add';
+  static const String addTransictions = '/add';
   static const String main = '/main';
   static const String notifications = '/notifications';
   static const String categoryDetail = '/category-detail';
@@ -45,7 +45,7 @@ class AppRoutes {
     profile: (context) => const ProfilePage(),
     categories: (context) => const CategoriesPage(),
     notifications: (context) => NotificationPage(),
-    addExpense: (context) => const AddExpenseScreen(),
+    addTransictions: (context) => const AddTransictionsScreen(),
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
     forgotPassword: (context) => const ForgotPasswordScreen(),
@@ -54,7 +54,8 @@ class AppRoutes {
     passwordSuccess: (context) => const PasswordSuccessScreen(),
     main: (context) => const MainScreen(),
     categoryDetail: (context) {
-      final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      final args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       return CategoryDetailPage(
         categoryLabel: args['categoryLabel'],
         categoryId: args['categoryId'],
@@ -63,4 +64,3 @@ class AppRoutes {
     },
   };
 }
-

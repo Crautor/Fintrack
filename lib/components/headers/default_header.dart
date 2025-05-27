@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fintrack/screens/notification_page.dart';
 
 class DefaultHeader extends StatelessWidget {
   final String title;
@@ -99,7 +98,7 @@ class DefaultHeader extends StatelessWidget {
                       splashRadius: 20,
                     ),
                   ),
-                ],
+                ],  
               ),
               if (child != null) ...[
                 const SizedBox(height: 16),
