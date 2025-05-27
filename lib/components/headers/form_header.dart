@@ -4,11 +4,7 @@ class FormHeader extends StatelessWidget {
   final String title;
   final VoidCallback? onBack;
 
-  const FormHeader({
-    super.key,
-    required this.title,
-    this.onBack,
-  });
+  const FormHeader({super.key, required this.title, this.onBack});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +19,7 @@ class FormHeader extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-         padding: const EdgeInsets.fromLTRB(20, 11, 20, 20),
+          padding: const EdgeInsets.fromLTRB(20, 11, 20, 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -51,7 +47,9 @@ class FormHeader extends StatelessWidget {
                     Icons.notifications_none,
                     color: Color(0xFF093030),
                   ),
-                  onPressed: () => {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/notifications');
+                  },
                   splashRadius: 20,
                 ),
               ),
