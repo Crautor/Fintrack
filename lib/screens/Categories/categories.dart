@@ -8,7 +8,9 @@ import 'package:fintrack/utils/icons.dart';
 class CategoriesPage extends StatelessWidget {
   final VoidCallback? onAddPressed;
 
-  const CategoriesPage({super.key, this.onAddPressed});
+  final void Function(Map<String, dynamic>)? onCategoryPressed;
+
+  const CategoriesPage({super.key, this.onAddPressed, this.onCategoryPressed});
 
   final List<Map<String, dynamic>> userCategories = const [
     {"id": 1, "label": "Comida", "iconId": 1},
@@ -65,21 +67,12 @@ class CategoriesPage extends StatelessWidget {
                 children: [
                   ...userCategories.map((category) {
                     final iconData =
-                        getCategoryIconById(category["id"])?.icon ?? Icons.help_outline;
+                        getCategoryIconById(category["id"])?.icon ??
+                        Icons.help_outline;
                     return CategoryItem(
                       icon: iconData,
                       label: category["label"],
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          '/category-detail',
-                          arguments: {
-                            'categoryLabel': category["label"],
-                            'categoryId': category["id"],
-                            'iconId': category["iconId"],
-                          },
-                        );
-                      },
+                      onTap: () => onCategoryPressed?.call(category),
                     );
                   }).toList(),
                   CategoryItem(
@@ -109,4 +102,3 @@ class CategoriesPage extends StatelessWidget {
     );
   }
 }
-
