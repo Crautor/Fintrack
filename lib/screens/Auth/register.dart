@@ -92,19 +92,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
         (json) => CadastroResponse.fromJson(json),
       );
 
-      if (response.success) {
+      if (response.data.success) {
         Fluttertoast.showToast(
-          msg: response.message,
+          msg: response.data.message,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           backgroundColor: Colors.green,
           textColor: Colors.white,
           fontSize: 16.0,
         );
+        if (!mounted) return;
         Navigator.pop(context);
       } else {
         Fluttertoast.showToast(
-          msg: response.message,
+          msg: response.data.message,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           backgroundColor: Colors.red,

@@ -1,19 +1,60 @@
 import 'dart:convert';
+import 'package:fintrack/models/Api/api.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class RequestService {
-  static const String baseUrl = 'http://10.200.143.157:3004/api/';
+  // static const String baseUrl = 'http://10.200.143.157:3004/api/';
+  static const String baseUrl =
+      'http://10.0.2.2:3004/api/'; // android studio fixo
 
-  static Map<String, String> _defaultHeaders() {
+  static Future<Map<String, String>> _defaultHeaders() async {
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'auth_token');
+
     final headers = {'Content-Type': 'application/json'};
 
-    // qnado for usar Authorization futuramente, já colocar aqui:
-    // final token = await SecureStorage.getToken(); (exemplo de onde buscar o token)
-    // if (token != null) {
-    //   headers['Authorization'] = 'Bearer $token';
-    // }
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
 
     return headers;
+  }
+
+  Future<void> printAuthToken() async {
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'auth_token');
+    final refreshToken = await storage.read(key: 'refresh_token');
+
+    print('[DEBUG] auth_token: $token');
+    print('[DEBUG] refresh_token: $refreshToken');
+  }
+
+  static Future<ApiResponse<T>> post<T>(
+    String endpoint,
+    dynamic body,
+    T Function(Map<String, dynamic>) fromJson,
+  ) async {
+    final url = Uri.parse('$baseUrl$endpoint');
+    final headers = await _defaultHeaders();
+
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode(body.toJson()),
+    );
+
+    print('[DEBUG] STATUS CODE: ${response.statusCode}');
+    print('[DEBUG] RAW BODY: ${response.body}');
+
+    final decoded = jsonDecode(response.body);
+    final data = fromJson(decoded);
+
+    return ApiResponse<T>(
+      data: data,
+      headers: response.headers,
+      statusCode: response.statusCode,
+    );
   }
 
   static Future<T> get<T>(
@@ -21,21 +62,8 @@ class RequestService {
     T Function(Map<String, dynamic>) fromJson,
   ) async {
     final url = Uri.parse('$baseUrl$endpoint');
-    final response = await http.get(url, headers: _defaultHeaders());
-    return _handleResponse(response, fromJson);
-  }
-
-  static Future<T> post<T>(
-    String endpoint,
-    dynamic body,
-    T Function(Map<String, dynamic>) fromJson,
-  ) async {
-    final url = Uri.parse('$baseUrl$endpoint');
-    final response = await http.post(
-      url,
-      headers: _defaultHeaders(),
-      body: jsonEncode(body.toJson()),
-    );
+    final headers = await _defaultHeaders();
+    final response = await http.get(url, headers: headers);
     return _handleResponse(response, fromJson);
   }
 
@@ -45,9 +73,11 @@ class RequestService {
     T Function(Map<String, dynamic>) fromJson,
   ) async {
     final url = Uri.parse('$baseUrl$endpoint');
+    final headers = await _defaultHeaders();
+
     final response = await http.patch(
       url,
-      headers: _defaultHeaders(),
+      headers: headers,
       body: jsonEncode(body.toJson()),
     );
     return _handleResponse(response, fromJson);
@@ -58,7 +88,9 @@ class RequestService {
     T Function(Map<String, dynamic>) fromJson,
   ) async {
     final url = Uri.parse('$baseUrl$endpoint');
-    final response = await http.delete(url, headers: _defaultHeaders());
+    final headers = await _defaultHeaders();
+
+    final response = await http.delete(url, headers: headers);
     return _handleResponse(response, fromJson);
   }
 
