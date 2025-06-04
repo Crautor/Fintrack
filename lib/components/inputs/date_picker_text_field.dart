@@ -31,9 +31,10 @@ class DatePickerField extends StatelessWidget {
       child: AbsorbPointer(
         child: TextFormField(
           controller: TextEditingController(
-            text: initialDate != null
-                ? DateFormat('dd/MM/yyyy').format(initialDate!)
-                : '',
+            text:
+                initialDate != null
+                    ? DateFormat('dd/MM/yyyy').format(initialDate!)
+                    : '',
           ),
           decoration: InputDecoration(
             hintText: hintText,

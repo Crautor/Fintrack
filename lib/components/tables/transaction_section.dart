@@ -2,6 +2,7 @@ import 'package:fintrack/components/tables/transaction_item_data_mapper.dart';
 import 'package:flutter/material.dart';
 import 'package:fintrack/models/transaction_item_data.dart';
 import 'package:fintrack/components/cards/transactions/transaction_card.dart';
+import 'package:fintrack/components/buttons/toggle_button.dart';
 
 class TransactionSection extends StatelessWidget {
   final List<String> toggleLabels;
@@ -23,21 +24,10 @@ class TransactionSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Center(
-          child: ToggleButtons(
+          child: ToggleButton(
             isSelected: isSelected,
-            onPressed: onToggle,
-            borderRadius: BorderRadius.circular(10),
-            selectedColor: Colors.white,
-            fillColor: const Color(0xFF00D084),
-            color: Colors.black87,
-            constraints: const BoxConstraints(minWidth: 110, minHeight: 40),
-            children:
-                toggleLabels
-                    .map(
-                      (label) =>
-                          Text(label, style: const TextStyle(fontSize: 16)),
-                    )
-                    .toList(),
+            toggleLabels: toggleLabels,
+            onToggle: onToggle,
           ),
         ),
         const SizedBox(height: 20),

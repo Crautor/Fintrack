@@ -3,9 +3,18 @@ import 'package:fintrack/models/transaction_item_data.dart';
 
 extension TransactionItemDataMapper on TransactionItemData {
   TransactionItem toTransactionItem() {
-    final parsedAmount = double.tryParse(
-      amount.replaceAll(RegExp(r'[^\d,.-]'), '').replaceAll(',', '.'),
-    ) ?? 0.0;
+    final sanitized = amount.replaceAll(RegExp(r'[^\d.,-]'), '');
+    final noThousandsSeparator = sanitized.replaceAll(
+      RegExp(r'(?<=\d)[.,](?=\d{3})'),
+      '',
+    );
+    final normalized = noThousandsSeparator.replaceAll(',', '.');
+
+    final parsedAmount = double.tryParse(normalized);
+
+    if (parsedAmount == null) {
+      print('Erro ao converter amount: "$amount" para double.');
+    }
 
     return TransactionItem(
       icon: icon,
@@ -13,8 +22,8 @@ extension TransactionItemDataMapper on TransactionItemData {
       time: time.split(" - ").first.trim(),
       date: time.split(" - ").last.trim(),
       category: category,
-      amount: parsedAmount.abs(),
-      isIncome: parsedAmount >= 0,
+      amount: parsedAmount?.abs() ?? 0.0,
+      isIncome: (parsedAmount ?? 0) >= 0,
     );
   }
-} 
+}

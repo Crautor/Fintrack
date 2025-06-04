@@ -98,7 +98,7 @@ class DefaultHeader extends StatelessWidget {
                       splashRadius: 20,
                     ),
                   ),
-                ],  
+                ],
               ),
               if (child != null) ...[
                 const SizedBox(height: 16),
