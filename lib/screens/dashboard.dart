@@ -9,7 +9,9 @@ import 'package:fintrack/models/transaction_item_data.dart';
 import 'package:flutter/material.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+  final VoidCallback? onCalendarPressed;
+
+  const DashboardPage({super.key, this.onCalendarPressed});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -285,6 +287,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 "monthly",
                                 "yearly",
                               ][selectedToggleIndex],
+                          onCalendarPressed: widget.onCalendarPressed,
                         ),
                       ),
 

@@ -2,9 +2,9 @@ import 'package:fintrack/components/layout/CategoriesTab/categories_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:fintrack/components/custom_nav_bar.dart';
 import 'package:fintrack/screens/home.dart';
-import 'package:fintrack/screens/dashboard.dart';
 import 'package:fintrack/screens/Transactions/transiction.dart';
 import 'package:fintrack/screens/profile.dart';
+import 'package:fintrack/components/layout/DashboardTab/dashboard_tab.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -22,7 +22,7 @@ class MainScreenState extends State<MainScreen> {
   List<Widget> _buildPages() {
     return [
       const HomePage(),
-      const DashboardPage(),
+      const DashboardTab(),
       const TransactionsScreen(),
       CategoriesTab(key: ValueKey(_currentIndex == 3 ? DateTime.now() : null)),
       const ProfilePage(),

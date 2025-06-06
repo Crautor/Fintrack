@@ -1,5 +1,4 @@
 import 'package:fintrack/models/transaction_item_data.dart';
-import 'package:fintrack/screens/Dashboard/calendar_page.dart';
 import 'package:fintrack/screens/Dashboard/search_page.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +6,13 @@ import 'package:flutter/material.dart';
 class IncomeExpenseBarChart extends StatelessWidget {
   final List<TransactionItemData> transactions;
   final String viewType;
+  final VoidCallback? onCalendarPressed;
 
   const IncomeExpenseBarChart({
     super.key,
     required this.transactions,
     required this.viewType,
+    this.onCalendarPressed,
   });
 
   Map<String, Map<String, double>> groupTransactionsByPeriod({
@@ -226,13 +227,7 @@ class IncomeExpenseBarChart extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const CalendarPage(),
-                      ),
-                    );
-                  },
+                  onPressed: onCalendarPressed,
                   icon: const Icon(Icons.calendar_month, color: Colors.white),
                   tooltip: 'Calendar',
                   splashRadius: 20,
