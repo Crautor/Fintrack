@@ -5,6 +5,7 @@ class DefaultHeader extends StatelessWidget {
   final String? subtitle;
   final bool isBackButtonVisible;
   final Widget? child;
+  final VoidCallback? onBack;
 
   const DefaultHeader({
     super.key,
@@ -12,6 +13,7 @@ class DefaultHeader extends StatelessWidget {
     this.subtitle,
     this.isBackButtonVisible = false,
     this.child,
+    this.onBack,
   });
 
   @override
@@ -41,7 +43,7 @@ class DefaultHeader extends StatelessWidget {
                   if (isBackButtonVisible)
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: onBack ?? () => Navigator.pop(context),
                     )
                   else
                     const SizedBox(width: 20),
@@ -98,7 +100,7 @@ class DefaultHeader extends StatelessWidget {
                       splashRadius: 20,
                     ),
                   ),
-                ],  
+                ],
               ),
               if (child != null) ...[
                 const SizedBox(height: 16),

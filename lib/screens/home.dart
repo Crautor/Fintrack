@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
       label: "Salary",
       time: "18:27 - April 01",
       category: "Revenue",
-      amount: "\$4,000.00",
+      amount: "\$4000.00",
       amountColor: Colors.black,
     ),
     TransactionItemData(
@@ -117,18 +117,18 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-                    LastWeekOverview(
-                      revenue: 4000.00,
-                      expense: 100.00,
-                      goalPercentage: 0.5,
-                    ),
-                    const SizedBox(height: 20),
-                    Expanded(
-                      child: TransactionSection(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      LastWeekOverview(
+                        revenue: 4000.00,
+                        expense: 100.00,
+                        goalPercentage: 0.5,
+                      ),
+                      const SizedBox(height: 20),
+                      TransactionSection(
                         toggleLabels: ["Daily", "Weekly", "Monthly"],
                         isSelected: List.generate(
                           3,
@@ -141,8 +141,8 @@ class _HomePageState extends State<HomePage> {
                         },
                         transactions: getSelectedTransactions(),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
