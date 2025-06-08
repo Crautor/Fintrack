@@ -23,7 +23,7 @@ class _CategoriesTabState extends State<CategoriesTab> {
   void openCategoryDetail(Map<String, dynamic> category) {
     setState(() {
       currentView = 'detail';
-      selectedCategory = category;
+      selectedCategory = {'id': category['id']};
     });
   }
 
@@ -42,10 +42,9 @@ class _CategoriesTabState extends State<CategoriesTab> {
 
     if (currentView == 'detail' && selectedCategory != null) {
       return CategoryDetailPage(
-        categoryLabel: selectedCategory!['label'],
         categoryId: selectedCategory!['id'],
-        iconId: selectedCategory!['iconId'],
         onAddTransictions: openAddTransictions,
+        onBack: backToCategories,
       );
     }
 

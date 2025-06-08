@@ -56,11 +56,7 @@ class AppRoutes {
     categoryDetail: (context) {
       final args =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-      return CategoryDetailPage(
-        categoryLabel: args['categoryLabel'],
-        categoryId: args['categoryId'],
-        iconId: args['iconId'],
-      );
+      return CategoryDetailPage(categoryId: args['categoryId']);
     },
   };
 }

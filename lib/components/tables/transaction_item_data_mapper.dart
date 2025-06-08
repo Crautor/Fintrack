@@ -12,10 +12,6 @@ extension TransactionItemDataMapper on TransactionItemData {
 
     final parsedAmount = double.tryParse(normalized);
 
-    if (parsedAmount == null) {
-      print('Erro ao converter amount: "$amount" para double.');
-    }
-
     return TransactionItem(
       icon: icon,
       title: label,
