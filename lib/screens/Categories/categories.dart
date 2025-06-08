@@ -1,34 +1,69 @@
+import 'package:flutter/material.dart';
 import 'package:fintrack/components/categoryItem/category_item.dart';
 import 'package:fintrack/components/headers/default_header.dart';
 import 'package:fintrack/components/overviews/general_overview.dart';
 import 'package:fintrack/screens/Categories/category_modal.dart';
-import 'package:flutter/material.dart';
+import 'package:fintrack/services/CategoryService/category_service.dart';
+import 'package:fintrack/models/Category/category.dart';
 import 'package:fintrack/utils/icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-class CategoriesPage extends StatelessWidget {
+class CategoriesPage extends StatefulWidget {
   final VoidCallback? onAddPressed;
-
   final void Function(Map<String, dynamic>)? onCategoryPressed;
 
   const CategoriesPage({super.key, this.onAddPressed, this.onCategoryPressed});
 
-  final List<Map<String, dynamic>> userCategories = const [
-    {"id": 1, "label": "Comida", "iconId": 1},
-    {"id": 2, "label": "Transporte", "iconId": 2},
-    {"id": 3, "label": "Saúde", "iconId": 3},
-    {"id": 4, "label": "Alimentos", "iconId": 4},
-    {"id": 5, "label": "Aluguel", "iconId": 5},
-    {"id": 6, "label": "Presentes", "iconId": 6},
-    {"id": 7, "label": "Poupança", "iconId": 7},
-    {"id": 8, "label": "Entretenimento", "iconId": 8},
-    {"id": 9, "label": "Compras", "iconId": 9},
-    {"id": 10, "label": "Educação", "iconId": 10},
-    {"id": 11, "label": "Viagens", "iconId": 11},
-    {"id": 12, "label": "Investimentos", "iconId": 12},
-    {"id": 13, "label": "Carro", "iconId": 13},
-    {"id": 14, "label": "Animais", "iconId": 14},
-    {"id": 15, "label": "Tecnologia", "iconId": 15},
-  ];
+  @override
+  State<CategoriesPage> createState() => _CategoriesPageState();
+}
+
+class _CategoriesPageState extends State<CategoriesPage> {
+  List<Category> userCategories = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadCategories();
+  }
+
+  Future<void> loadCategories() async {
+    try {
+      final categories = await CategoryService.getCategories();
+      setState(() {
+        userCategories = categories;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      Fluttertoast.showToast(
+        msg: 'Erro ao carregar categorias',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  void handleCreateCategory(String name, CategoryIcon icon) async {
+    try {
+      await CategoryService.createCategory(
+        Category(name: name, icon: icon.id.toString()),
+      );
+      await loadCategories();
+      Fluttertoast.showToast(
+        msg: 'Categoria criada com sucesso!',
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Erro ao criar categoria',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,43 +93,48 @@ class CategoriesPage extends StatelessWidget {
                 ),
               ),
               padding: EdgeInsets.zero,
-              child: GridView.count(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                crossAxisCount: 3,
-                mainAxisSpacing: 15,
-                crossAxisSpacing: 15,
-                childAspectRatio: 0.8,
-                children: [
-                  ...userCategories.map((category) {
-                    final iconData =
-                        getCategoryIconById(category["id"])?.icon ??
-                        Icons.help_outline;
-                    return CategoryItem(
-                      icon: iconData,
-                      label: category["label"],
-                      onTap: () => onCategoryPressed?.call(category),
-                    );
-                  }).toList(),
-                  CategoryItem(
-                    icon: Icons.add,
-                    label: "Criar",
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return CategoryModal(
-                            onSave: (name, icon) {
-                              print(
-                                'Nova categoria criada: $name com ícone ${icon.label}',
+              child:
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : GridView.count(
+                        padding: const EdgeInsets.all(20),
+                        crossAxisCount: 3,
+                        mainAxisSpacing: 15,
+                        crossAxisSpacing: 15,
+                        childAspectRatio: 0.8,
+                        children: [
+                          ...userCategories.map((category) {
+                            final iconData =
+                                getCategoryIconById(
+                                  int.tryParse(category.icon ?? '') ?? 0,
+                                )?.icon ??
+                                Icons.help_outline;
+
+                            return CategoryItem(
+                              icon: iconData,
+                              label: category.name,
+                              onTap:
+                                  () => widget.onCategoryPressed?.call({
+                                    "id": category.categoryId,
+                                  }),
+                            );
+                          }),
+                          CategoryItem(
+                            icon: Icons.add,
+                            label: "Criar",
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return CategoryModal(
+                                    onSave: handleCreateCategory,
+                                  );
+                                },
                               );
                             },
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
+                          ),
+                        ],
+                      ),
             ),
           ),
         ],

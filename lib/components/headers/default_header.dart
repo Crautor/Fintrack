@@ -6,6 +6,7 @@ class DefaultHeader extends StatelessWidget {
   final bool isBackButtonVisible;
   final Widget? child;
   final VoidCallback? onBack;
+  final List<Widget>? extraActions; // ✅ apenas ícones adicionais
 
   const DefaultHeader({
     super.key,
@@ -14,6 +15,7 @@ class DefaultHeader extends StatelessWidget {
     this.isBackButtonVisible = false,
     this.child,
     this.onBack,
+    this.extraActions,
   });
 
   @override
@@ -47,6 +49,7 @@ class DefaultHeader extends StatelessWidget {
                     )
                   else
                     const SizedBox(width: 20),
+
                   Expanded(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -82,26 +85,38 @@ class DefaultHeader extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.notifications_none,
-                        color: Color(0xFF093030),
+
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // ✅ ícones extras (como lixeira, editar etc.)
+                      if (extraActions != null) ...extraActions!,
+                      // ✅ botão de notificação garantido sempre
+                      Container(
+                        width: 40,
+                        height: 40,
+                        margin: const EdgeInsets.only(left: 8),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.notifications_none,
+                            color: Color(0xFF093030),
+                          ),
+                          onPressed:
+                              () => Navigator.of(
+                                context,
+                              ).pushNamed('/notifications'),
+                          splashRadius: 20,
+                        ),
                       ),
-                      onPressed: () {
-                        Navigator.of(context).pushNamed('/notifications');
-                      },
-                      splashRadius: 20,
-                    ),
+                    ],
                   ),
                 ],
               ),
+
               if (child != null) ...[
                 const SizedBox(height: 16),
                 Container(

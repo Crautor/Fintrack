@@ -5,8 +5,15 @@ import 'package:fintrack/utils/icons.dart';
 
 class CategoryModal extends StatefulWidget {
   final void Function(String name, CategoryIcon icon) onSave;
+  final String? initialName;
+  final int? initialIconId;
 
-  const CategoryModal({super.key, required this.onSave});
+  const CategoryModal({
+    super.key,
+    required this.onSave,
+    this.initialName,
+    this.initialIconId,
+  });
 
   @override
   State<CategoryModal> createState() => _CategoryModalState();
@@ -15,6 +22,18 @@ class CategoryModal extends StatefulWidget {
 class _CategoryModalState extends State<CategoryModal> {
   final TextEditingController _nameController = TextEditingController();
   CategoryIcon? _selectedIcon;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = widget.initialName ?? '';
+    if (widget.initialIconId != null) {
+      _selectedIcon = categoryIcons.firstWhere(
+        (icon) => icon.id == widget.initialIconId,
+        orElse: () => categoryIcons.first,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +46,11 @@ class _CategoryModalState extends State<CategoryModal> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'New Category',
-                style: TextStyle(
+              Text(
+                widget.initialName != null
+                    ? 'Editar Categoria'
+                    : 'Nova Categoria',
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF093030),
@@ -37,20 +58,19 @@ class _CategoryModalState extends State<CategoryModal> {
               ),
               const SizedBox(height: 20),
               CustomTextField(
-                hintText: 'Write...',
+                hintText: 'Nome da categoria...',
                 controller: _nameController,
               ),
               const SizedBox(height: 20),
               CustomIconPickerField(
                 selectedIcon: _selectedIcon,
-                onTap: () {
-                  _openIconPicker(context);
-                },
+                onTap: () => _openIconPicker(context),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  if (_nameController.text.isNotEmpty && _selectedIcon != null) {
+                  if (_nameController.text.isNotEmpty &&
+                      _selectedIcon != null) {
                     widget.onSave(_nameController.text, _selectedIcon!);
                     Navigator.pop(context);
                   }
@@ -63,7 +83,7 @@ class _CategoryModalState extends State<CategoryModal> {
                   minimumSize: const Size(double.infinity, 50),
                 ),
                 child: const Text(
-                  'Save',
+                  'Salvar',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -72,9 +92,7 @@ class _CategoryModalState extends State<CategoryModal> {
               ),
               const SizedBox(height: 10),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFDFF7E2),
                   shape: RoundedRectangleBorder(
@@ -83,7 +101,7 @@ class _CategoryModalState extends State<CategoryModal> {
                   minimumSize: const Size(double.infinity, 50),
                 ),
                 child: const Text(
-                  'Cancel',
+                  'Cancelar',
                   style: TextStyle(
                     color: Color(0xFF093030),
                     fontWeight: FontWeight.bold,
@@ -111,27 +129,28 @@ class _CategoryModalState extends State<CategoryModal> {
             padding: const EdgeInsets.all(16),
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
-            children: categoryIcons.map((icon) {
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedIcon = icon;
-                  });
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _selectedIcon?.id == icon.id
-                        ? const Color(0xFF0075FF)
-                        : const Color(0xFFB2D8FF),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Center(
-                    child: Icon(icon.icon, color: Colors.white, size: 28),
-                  ),
-                ),
-              );
-            }).toList(),
+            children:
+                categoryIcons.map((icon) {
+                  final isSelected = _selectedIcon?.id == icon.id;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() => _selectedIcon = icon);
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color:
+                            isSelected
+                                ? const Color(0xFF0075FF)
+                                : const Color(0xFFB2D8FF),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Icon(icon.icon, color: Colors.white, size: 28),
+                      ),
+                    ),
+                  );
+                }).toList(),
           ),
         );
       },

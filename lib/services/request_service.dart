@@ -38,17 +38,29 @@ class RequestService {
     final url = Uri.parse('$baseUrl$endpoint');
     final headers = await _defaultHeaders();
 
+    print('[HTTP] → POST $url');
+    print('[HTTP] Headers: $headers');
+    print('[HTTP] Body: ${body.toJson()}');
+
     final response = await http.post(
       url,
       headers: headers,
       body: jsonEncode(body.toJson()),
     );
 
-    print('[DEBUG] STATUS CODE: ${response.statusCode}');
-    print('[DEBUG] RAW BODY: ${response.body}');
+    print('[HTTP] ← Status: ${response.statusCode}');
+    print('[HTTP] ← Body: ${response.body}');
 
-    final decoded = jsonDecode(response.body);
-    final data = fromJson(decoded);
+    T data;
+
+    if (T.toString() == 'void' ||
+        response.statusCode == 204 ||
+        response.body.isEmpty) {
+      data = null as T;
+    } else {
+      final decoded = jsonDecode(response.body);
+      data = fromJson(decoded);
+    }
 
     return ApiResponse<T>(
       data: data,
@@ -63,11 +75,14 @@ class RequestService {
   ) async {
     final url = Uri.parse('$baseUrl$endpoint');
     final headers = await _defaultHeaders();
+
+    print('[HTTP] → GET $url');
     final response = await http.get(url, headers: headers);
+
     return _handleResponse(response, fromJson);
   }
 
-  static Future<T> patch<T>(
+  static Future<ApiResponse<T>> patch<T>(
     String endpoint,
     dynamic body,
     T Function(Map<String, dynamic>) fromJson,
@@ -80,10 +95,56 @@ class RequestService {
       headers: headers,
       body: jsonEncode(body.toJson()),
     );
-    return _handleResponse(response, fromJson);
+
+    T data = _handleResponse(response, fromJson);
+
+    return ApiResponse<T>(
+      data: data,
+      headers: response.headers,
+      statusCode: response.statusCode,
+    );
   }
 
-  static Future<T> delete<T>(
+  static Future<ApiResponse<T>> put<T>(
+    String endpoint,
+    dynamic body,
+    T Function(Map<String, dynamic>) fromJson,
+  ) async {
+    final url = Uri.parse('$baseUrl$endpoint');
+    final headers = await _defaultHeaders();
+
+    print('[HTTP] → PUT $url');
+    print('[HTTP] Headers: $headers');
+    print('[HTTP] Body: ${body.toJson()}');
+
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: jsonEncode(body.toJson()),
+    );
+
+    print('[HTTP] ← Status: ${response.statusCode}');
+    print('[HTTP] ← Body: ${response.body}');
+
+    T data;
+
+    if (T.toString() == 'void' ||
+        response.statusCode == 204 ||
+        response.body.isEmpty) {
+      data = null as T;
+    } else {
+      final decoded = jsonDecode(response.body);
+      data = fromJson(decoded);
+    }
+
+    return ApiResponse<T>(
+      data: data,
+      headers: response.headers,
+      statusCode: response.statusCode,
+    );
+  }
+
+  static Future<ApiResponse<T>> delete<T>(
     String endpoint,
     T Function(Map<String, dynamic>) fromJson,
   ) async {
@@ -91,13 +152,24 @@ class RequestService {
     final headers = await _defaultHeaders();
 
     final response = await http.delete(url, headers: headers);
-    return _handleResponse(response, fromJson);
+    final data = _handleResponse(response, fromJson);
+
+    return ApiResponse<T>(
+      data: data,
+      headers: response.headers,
+      statusCode: response.statusCode,
+    );
   }
 
   static T _handleResponse<T>(
     http.Response response,
     T Function(Map<String, dynamic>) fromJson,
   ) {
+    if (T.toString() == "void" || response.statusCode == 204) {
+      fromJson({});
+      return null as T;
+    }
+
     final decoded = jsonDecode(response.body);
     return fromJson(decoded);
   }

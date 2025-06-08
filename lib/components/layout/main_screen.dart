@@ -24,7 +24,7 @@ class MainScreenState extends State<MainScreen> {
       const HomePage(),
       const DashboardTab(),
       const TransactionsScreen(),
-      CategoriesTab(key: ValueKey(_currentIndex == 3 ? DateTime.now() : null)),
+       CategoriesTab(key: ValueKey(_currentIndex == 3 ? DateTime.now() : null)),
       const ProfilePage(),
     ];
   }
