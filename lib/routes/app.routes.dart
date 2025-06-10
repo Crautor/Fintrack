@@ -16,6 +16,7 @@ import '../screens/profile.dart';
 import '../components/layout/main_screen.dart';
 import '../screens/notification_page.dart';
 import 'package:fintrack/screens/Categories/category_detail.dart';
+import 'package:fintrack/screens/edit_profile.dart';
 
 class AppRoutes {
   static const String prelogin = '/prelogin';
@@ -35,6 +36,7 @@ class AppRoutes {
   static const String main = '/main';
   static const String notifications = '/notifications';
   static const String categoryDetail = '/category-detail';
+  static const String editProfile = '/edit-profile';
 
   static final Map<String, WidgetBuilder> routes = {
     prelogin: (context) => const PreLoginScreen(),
@@ -58,5 +60,6 @@ class AppRoutes {
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       return CategoryDetailPage(categoryId: args['categoryId']);
     },
+    editProfile: (context) => const EditProfilePage(),
   };
 }

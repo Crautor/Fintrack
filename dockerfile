@@ -1,4 +1,4 @@
-FROM instrumentisto/flutter
+FROM instrumentisto/flutter:3.32.0
 
 WORKDIR /app
 
