@@ -9,10 +9,7 @@ class ProfilePage extends StatelessWidget {
       backgroundColor: const Color(0xFFEFFFF3),
       body: Stack(
         children: [
-          Container(
-            height: 220,
-            color: const Color(0xFF00C689),
-          ),
+          Container(height: 220, color: const Color(0xFF00C689)),
 
           Positioned(
             top: 150,
@@ -36,25 +33,28 @@ class ProfilePage extends StatelessWidget {
                 const SizedBox(height: 50),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
+                  child: Stack(
+                    alignment: Alignment.center,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                      const Spacer(),
-                      const Text(
-                        'Perfil',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      const Center(
+                        child: Text(
+                          'Perfil',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                      const Spacer(),
-                      IconButton(
-                        icon: const Icon(Icons.notifications_none, color: Colors.white),
-                        onPressed: () {},
+                      Positioned(
+                        right: 0,
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.notifications_none,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {},
+                        ),
                       ),
                     ],
                   ),
@@ -87,20 +87,18 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'ID: 25030024',
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14,
-                  ),
-                ),
+
                 const SizedBox(height: 30),
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
                   child: Column(
                     children: [
-                      _buildOptionButton(Icons.person_outline, "Editar Perfil", context),
+                      _buildOptionButton(
+                        Icons.person_outline,
+                        "Editar Perfil",
+                        context,
+                      ),
                       const SizedBox(height: 20),
                       _buildOptionButton(Icons.logout, "Sair", context),
                       const SizedBox(height: 40),
@@ -142,16 +140,10 @@ class ProfilePage extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(color: Colors.black, fontSize: 16),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-
-
-
-
-

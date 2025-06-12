@@ -6,7 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class RequestService {
   // static const String baseUrl = 'http://10.200.143.157:3004/api/';
   static const String baseUrl =
-      'http://localhost:3000/api/'; // android studio fixo
+      'http://10.0.2.2:3000/api/'; // android studio fixo
 
   static Future<Map<String, String>> _defaultHeaders() async {
     final storage = FlutterSecureStorage();

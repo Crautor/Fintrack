@@ -49,7 +49,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                          ),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         const Spacer(),
@@ -63,7 +66,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                         const Spacer(),
                         IconButton(
-                          icon: const Icon(Icons.notifications_none, color: Colors.white),
+                          icon: const Icon(
+                            Icons.notifications_none,
+                            color: Colors.white,
+                          ),
                           onPressed: () {},
                         ),
                       ],
@@ -90,10 +96,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       color: Colors.black,
                     ),
                   ),
-                  const Text(
-                    'ID: 25030024',
-                    style: TextStyle(color: Colors.black54, fontSize: 12),
-                  ),
+
                   const SizedBox(height: 10),
                   Expanded(
                     child: Padding(
@@ -113,12 +116,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           _buildTextField("Nome De Usuário", _nameController),
                           _buildTextField("Telefone", _phoneController),
                           _buildTextField("Email", _emailController),
-                          _buildSwitch("Permitir Notificações", notificationsEnabled, (val) {
-                            setState(() => notificationsEnabled = val);
-                          }),
-                          _buildSwitch("Tema Escuro", darkModeEnabled, (val) {
-                            setState(() => darkModeEnabled = val);
-                          }),
+                          _buildSwitch(
+                            "Permitir Notificações",
+                            notificationsEnabled,
+                            (val) {
+                              setState(() => notificationsEnabled = val);
+                            },
+                          ),
+
                           const Spacer(),
                           ElevatedButton(
                             onPressed: () {
@@ -134,7 +139,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             ),
                             child: const Text(
                               "Atualizar Perfil",
-                              style: TextStyle(fontSize: 15, color: Colors.white),
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -157,7 +165,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 4),
           TextField(
             controller: controller,
@@ -165,7 +176,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white70,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -183,7 +197,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+          ),
           Switch(
             value: value,
             onChanged: onChanged,
@@ -194,10 +211,3 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 }
-
-
-
-
-
-
-
