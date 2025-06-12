@@ -1,22 +1,27 @@
+import 'package:fintrack/models/Transaction/transaction.dart';
 import 'package:fintrack/screens/Categories/category_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:fintrack/components/headers/default_header.dart';
 import 'package:fintrack/components/overviews/general_overview.dart';
 import 'package:fintrack/models/Category/category.dart';
 import 'package:fintrack/services/CategoryService/category_service.dart';
+import 'package:fintrack/services/TransactionService/transaction_service.dart';
 import 'package:fintrack/utils/icons.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class CategoryDetailPage extends StatefulWidget {
   final int categoryId;
   final VoidCallback? onAddTransictions;
   final VoidCallback? onBack;
+  final void Function(int categoryId, int transactionId)? onEditTransaction;
 
   const CategoryDetailPage({
     super.key,
     required this.categoryId,
     this.onAddTransictions,
     this.onBack,
+    this.onEditTransaction,
   });
 
   @override
@@ -26,41 +31,75 @@ class CategoryDetailPage extends StatefulWidget {
 class _CategoryDetailPageState extends State<CategoryDetailPage> {
   Category? category;
   bool isLoading = true;
-
-  final List<Map<String, dynamic>> expenses = [
-    {'title': 'Jantar', 'time': '18:27', 'date': 'April 30', 'value': 26.00},
-    {
-      'title': 'Delivery Pizza',
-      'time': '15:00',
-      'date': 'April 24',
-      'value': 18.35,
-    },
-    {'title': 'Almoço', 'time': '12:30', 'date': 'April 15', 'value': 15.40},
-    {
-      'title': 'Café Da Manhã',
-      'time': '09:30',
-      'date': 'April 08',
-      'value': 12.13,
-    },
-    {'title': 'Jantar', 'time': '20:50', 'date': 'March 31', 'value': 27.20},
-  ];
+  bool _isLoadingCategory = false;
+  List<TransactionItem> transactions = [];
+  List<TransactionItem> allTransactions = [];
+  final storage = const FlutterSecureStorage();
+  String? userEmail;
 
   @override
   void initState() {
     super.initState();
-    loadCategory();
+    loadData();
+  }
+
+  Future<void> loadData() async {
+    setState(() => isLoading = true);
+    await Future.wait([loadCategory(), loadTransactions()]);
+    setState(() => isLoading = false);
   }
 
   Future<void> loadCategory() async {
+    if (_isLoadingCategory || category != null) return;
+
+    _isLoadingCategory = true;
     try {
-      final result = await CategoryService.getCategoryById(widget.categoryId);
-      setState(() {
-        category = result;
-        isLoading = false;
-      });
+      final storedEmail = await storage.read(key: 'user-mail');
+      if (!mounted || storedEmail == null) return;
+      userEmail = storedEmail;
+
+      final cat = await CategoryService.getCategoryById(
+        widget.categoryId,
+        storedEmail,
+      );
+
+      if (mounted && cat != null) {
+        setState(() => category = cat);
+      }
+    } catch (e, stack) {
+      print('[ERROR loadCategory] $e\n$stack');
+      Fluttertoast.showToast(
+        msg: 'Erro ao carregar dados da categoria',
+        backgroundColor: Colors.red,
+      );
+    } finally {
+      _isLoadingCategory = false;
+    }
+  }
+
+  Future<void> loadTransactions() async {
+    try {
+      final storedEmail = await storage.read(key: 'user-mail');
+      if (!mounted || storedEmail == null) return;
+      userEmail = storedEmail;
+
+      final fetched = await TransactionService.getAll(storedEmail);
+
+      final filtered =
+          fetched.where((t) => t.categoryId == widget.categoryId).toList();
+
+      if (mounted) {
+        setState(() {
+          allTransactions = fetched;
+          transactions = filtered;
+        });
+      }
     } catch (e) {
-      Fluttertoast.showToast(msg: 'Erro ao carregar categoria');
-      setState(() => isLoading = false);
+      print('[ERROR loadTransactions] $e');
+      Fluttertoast.showToast(
+        msg: 'Erro ao carregar transações',
+        backgroundColor: Colors.red,
+      );
     }
   }
 
@@ -97,14 +136,8 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
         msg: 'Categoria removida com sucesso!',
         backgroundColor: Colors.green,
       );
-
       if (!mounted) return;
-
-      if (widget.onBack != null) {
-        widget.onBack!();
-      } else {
-        Navigator.pop(context);
-      }
+      widget.onBack?.call();
     } catch (e) {
       Fluttertoast.showToast(
         msg: 'Erro ao remover categoria',
@@ -118,14 +151,28 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     if (isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+
     if (category == null) {
       return const Scaffold(
         body: Center(child: Text("Categoria não encontrada")),
       );
     }
+
     final iconData =
         getCategoryIconById(int.tryParse(category!.icon ?? '') ?? 0)?.icon ??
         Icons.help_outline;
+
+    final categoryTotal = transactions.fold<double>(
+      0.0,
+      (sum, item) => sum + item.value,
+    );
+
+    final overallTotal = allTransactions.fold<double>(
+      0.0,
+      (sum, item) => sum + item.value,
+    );
+
+    final percentage = overallTotal > 0 ? categoryTotal / overallTotal : 0.0;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4FFFB),
@@ -155,7 +202,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                               icon: updatedIcon.id.toString(),
                             ),
                           );
-                          await loadCategory();
+                          await loadData(); // Atualiza após edição
                         },
                       );
                     },
@@ -163,14 +210,13 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                 },
               ),
             ],
-            child: const GeneralOverview(
-              balance: 7783.00,
-              expense: 1187.40,
-              goal: 20000.00,
-              percentage: 0.30,
+            child: GeneralOverview(
+              balance: overallTotal,
+              expense: categoryTotal,
+              percentage: percentage,
+              goal: 0,
             ),
           ),
-
           const SizedBox(height: 12),
           Expanded(
             child: Padding(
@@ -178,14 +224,8 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
               child: ListView(
                 children: [
                   _buildTransictionsSection(
-                    "Abril",
-                    expenses.sublist(0, 4),
-                    iconData,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTransictionsSection(
-                    "Março",
-                    expenses.sublist(4),
+                    "Transações",
+                    transactions,
                     iconData,
                   ),
                   Column(
@@ -232,15 +272,15 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
   }
 
   Widget _buildTransictionsSection(
-    String month,
-    List<Map<String, dynamic>> items,
+    String title,
+    List<TransactionItem> items,
     IconData iconData,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          month,
+          title,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
@@ -249,48 +289,61 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     );
   }
 
-  Widget _buildTransictionsItem(Map<String, dynamic> item, IconData iconData) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: const Color(0xFFE1F3FF),
-            child: Icon(iconData, color: const Color(0xFF187DFE)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item['title'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+  Widget _buildTransictionsItem(TransactionItem item, IconData iconData) {
+    final date = DateTime.tryParse(item.transactionDate);
+    final formattedDate =
+        date != null
+            ? "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}"
+            : "Data inválida";
+
+    return GestureDetector(
+      onTap: () {
+        if (widget.onEditTransaction != null && item.transactionId != null) {
+          widget.onEditTransaction!(item.categoryId, item.transactionId!);
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: const Color(0xFFE1F3FF),
+              child: Icon(iconData, color: const Color(0xFF187DFE)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.description ?? 'Sem descrição',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "${item['time']} – ${item['date']}",
-                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    formattedDate,
+                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Text(
-            "-\$${item['value'].toStringAsFixed(2)}",
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF187DFE),
+            Text(
+              "-R\$${item.value.toStringAsFixed(2)}",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF187DFE),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

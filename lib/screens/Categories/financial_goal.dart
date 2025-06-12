@@ -2,38 +2,23 @@ import 'package:fintrack/components/inputs/custom_text_field.dart';
 import 'package:fintrack/components/inputs/custom_icon_picker_field.dart';
 import 'package:flutter/material.dart';
 import 'package:fintrack/utils/icons.dart';
+import 'package:fintrack/models/Financial_Goal/financial_goal.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class CategoryModal extends StatefulWidget {
-  final void Function(String name, CategoryIcon icon) onSave;
-  final String? initialName;
-  final int? initialIconId;
+class FinancialGoalModal extends StatefulWidget {
+  final void Function(FinancialGoal) onSave;
 
-  const CategoryModal({
-    super.key,
-    required this.onSave,
-    this.initialName,
-    this.initialIconId,
-  });
+  const FinancialGoalModal({super.key, required this.onSave});
 
   @override
-  State<CategoryModal> createState() => _CategoryModalState();
+  State<FinancialGoalModal> createState() => _FinancialGoalModalState();
 }
 
-class _CategoryModalState extends State<CategoryModal> {
-  final TextEditingController _nameController = TextEditingController();
+class _FinancialGoalModalState extends State<FinancialGoalModal> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _valueController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
   CategoryIcon? _selectedIcon;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController.text = widget.initialName ?? '';
-    if (widget.initialIconId != null) {
-      _selectedIcon = categoryIcons.firstWhere(
-        (icon) => icon.id == widget.initialIconId,
-        orElse: () => categoryIcons.first,
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,11 +31,9 @@ class _CategoryModalState extends State<CategoryModal> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                widget.initialName != null
-                    ? 'Editar Categoria'
-                    : 'Nova Categoria',
-                style: const TextStyle(
+              const Text(
+                'Nova Meta Financeira',
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF093030),
@@ -58,8 +41,19 @@ class _CategoryModalState extends State<CategoryModal> {
               ),
               const SizedBox(height: 20),
               CustomTextField(
-                hintText: 'Nome da categoria...',
-                controller: _nameController,
+                hintText: 'Título da meta...',
+                controller: _titleController,
+              ),
+              const SizedBox(height: 20),
+              CustomTextField(
+                hintText: 'Descrição...',
+                controller: _descriptionController,
+              ),
+              const SizedBox(height: 20),
+              CustomTextField(
+                hintText: 'Valor da meta (R\$)',
+                controller: _valueController,
+                keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 20),
               CustomIconPickerField(
@@ -68,19 +62,42 @@ class _CategoryModalState extends State<CategoryModal> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  print('[DEBUG] Nome digitado: ${_nameController.text}');
-                  print('[DEBUG] Ícone selecionado: ${_selectedIcon?.id}');
+                onPressed: () async {
+                  final title = _titleController.text.trim();
+                  final value = double.tryParse(_valueController.text.trim());
+                  final description = _descriptionController.text.trim();
 
-                  if (_nameController.text.isNotEmpty &&
+                  if (title.isNotEmpty &&
+                      value != null &&
                       _selectedIcon != null) {
-                    print('[DEBUG] Chamando onSave com nome e ícone válidos');
-                    widget.onSave(_nameController.text, _selectedIcon!);
-                    Navigator.pop(context);
-                  } else {
-                    print('[DEBUG] Campos inválidos - onSave NÃO chamado');
+                    final storage = FlutterSecureStorage();
+                    final userId = await storage.read(key: 'user-mail');
+
+                    // if (userId == null) {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     const SnackBar(
+                    //       content: Text(
+                    //         'Usuário não encontrado. Faça login novamente.',
+                    //       ),
+                    //       backgroundColor: Colors.red,
+                    //     ),
+                    //   );
+                    //   return;
+                    // }
+
+                    final goal = FinancialGoal(
+                      title: title,
+                      value: value,
+                      description: description,
+                      iconId: _selectedIcon!.id,
+                      // userId: userId,
+                    );
+
+                    widget.onSave(goal);
+                    if (context.mounted) Navigator.pop(context);
                   }
                 },
+
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00C49A),
                   shape: RoundedRectangleBorder(
@@ -96,7 +113,6 @@ class _CategoryModalState extends State<CategoryModal> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
