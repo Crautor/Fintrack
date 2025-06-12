@@ -48,6 +48,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.isSuccess) {
+        await storage.write(key: 'user-mail', value: email);
+        await storage.read(key: 'user-mail');
         final setCookie = response.headers['set-cookie'];
 
         final authToken = RegExp(

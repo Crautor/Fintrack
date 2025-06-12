@@ -130,19 +130,6 @@ class GeneralOverview extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Icon(Icons.check_box, size: 16),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                "${(percentage * 100).toStringAsFixed(0)}% of your expenses, looks good.",
-                style: TextStyle(color: Colors.black87),
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
