@@ -2,19 +2,32 @@ class Category {
   final int? categoryId;
   final String name;
   final String? icon;
+  final String? email;
 
-  Category({this.categoryId, required this.name, this.icon});
+  Category({this.categoryId, required this.name, this.icon, this.email});
 
   factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
-      categoryId: json['categoryId'],
-      name: json['name'],
-      icon: json['icon'],
-    );
+    try {
+      print('[DEBUG Category.fromJson] Recebido: $json');
+      return Category(
+        categoryId:
+            json['categoryId'] is int
+                ? json['categoryId']
+                : int.tryParse(json['categoryId'].toString()),
+        name: json['name'] ?? 'Sem nome',
+        icon: json['icon']?.toString(),
+        email: json['email'], // pode ser null
+      );
+    } catch (e, stack) {
+      print('[ERROR Category.fromJson] Falhou ao converter: $e');
+      print('[STACK] $stack');
+      print('[JSON] $json');
+      rethrow;
+    }
   }
 
   static Category fromItemResponse(Map<String, dynamic> json) {
-    return Category.fromJson(json['item']);
+    return Category.fromJson(json['item']); // só use se o JSON tiver "item"
   }
 
   static List<Category> fromListResponse(Map<String, dynamic> json) {
@@ -23,6 +36,13 @@ class Category {
   }
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'icon': icon};
+    if (email == null) {
+      return {'name': name, 'icon': icon};
+    } else {
+      return {'name': name, 'icon': icon, 'email': email};
+    }
   }
+
+  @override
+  String toString() => name;
 }

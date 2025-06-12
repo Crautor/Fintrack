@@ -47,7 +47,14 @@ class AppRoutes {
     profile: (context) => const ProfilePage(),
     categories: (context) => const CategoriesPage(),
     notifications: (context) => NotificationPage(),
-    addTransictions: (context) => const AddTransictionsScreen(),
+    addTransictions: (context) {
+      final args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      return AddTransictionsScreen(
+        categoryId: args['categoryId'],
+        onBack: () => Navigator.pop(context),
+      );
+    },
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
     forgotPassword: (context) => const ForgotPasswordScreen(),

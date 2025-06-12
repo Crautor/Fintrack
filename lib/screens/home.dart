@@ -4,6 +4,7 @@ import 'package:fintrack/components/overviews/last_week_overview.dart';
 import 'package:fintrack/components/tables/transaction_section.dart';
 import 'package:fintrack/models/transaction_item_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -86,6 +87,21 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _loadAndPrintAuthInfo();
+  }
+  
+Future<void> _loadAndPrintAuthInfo() async {
+  print('[DEBUG] Iniciando leitura dos tokens...');
+  final storage = FlutterSecureStorage();
+  final token = await storage.read(key: 'auth_token');
+  final storedEmail = await storage.read(key: 'user-mail');
+
+  print('[DEBUG] auth_token: $token');
+  print('[DEBUG] user-mail: $storedEmail');
+}
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;

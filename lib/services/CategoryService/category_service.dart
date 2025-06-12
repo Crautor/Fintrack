@@ -5,22 +5,27 @@ import 'package:fintrack/models/Category/category.dart';
 class CategoryService {
   static const String _endpoint = 'category';
 
-  /// GET - Lista de categorias
-  static Future<List<Category>> getCategories() async {
+  /// GET - Lista de categorias por email
+  static Future<List<Category>> getCategories(String email) async {
     final result = await RequestService.get<List<Category>>(
-      _endpoint,
+      '$_endpoint?email=$email',
       (json) => Category.fromListResponse(json),
     );
     return result;
   }
 
-  /// GET - Categoria por ID
-  static Future<Category> getCategoryById(int id) async {
-    final result = await RequestService.get<Category>(
-      '$_endpoint/$id',
-      (json) => Category.fromJson(json),
-    );
-    return result;
+  /// GET - Categoria por ID e email
+  static Future<Category?> getCategoryById(int id, String email) async {
+    try {
+      final result = await RequestService.get<Category>(
+        '$_endpoint/$id?email=$email',
+        (json) => Category.fromJson(json),
+      );
+      return result;
+    } catch (e) {
+      print('[ERROR] getCategoryById → $e');
+      return null;
+    }
   }
 
   /// POST - Criar nova categoria

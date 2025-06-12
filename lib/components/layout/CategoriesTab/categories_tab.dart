@@ -13,6 +13,7 @@ class CategoriesTab extends StatefulWidget {
 class _CategoriesTabState extends State<CategoriesTab> {
   String? currentView;
   Map<String, dynamic>? selectedCategory;
+  int? editingTransactionId;
 
   void openAddTransictions() {
     setState(() {
@@ -27,6 +28,14 @@ class _CategoriesTabState extends State<CategoriesTab> {
     });
   }
 
+  void openEditTransaction(int categoryId, int transactionId) {
+    setState(() {
+      selectedCategory = {'id': categoryId};
+      editingTransactionId = transactionId;
+      currentView = 'add';
+    });
+  }
+
   void backToCategories() {
     setState(() {
       currentView = null;
@@ -36,15 +45,26 @@ class _CategoriesTabState extends State<CategoriesTab> {
 
   @override
   Widget build(BuildContext context) {
-    if (currentView == 'add') {
-      return AddTransictionsScreen(onBack: backToCategories);
-    }
-
     if (currentView == 'detail' && selectedCategory != null) {
       return CategoryDetailPage(
+        key: ValueKey(selectedCategory!['id']), 
         categoryId: selectedCategory!['id'],
         onAddTransictions: openAddTransictions,
+        onEditTransaction: openEditTransaction,
         onBack: backToCategories,
+      );
+    }
+
+    if (currentView == 'add' && selectedCategory != null) {
+      return AddTransictionsScreen(
+        categoryId: selectedCategory!['id'],
+        transactionId: editingTransactionId,
+        onBack: () {
+          setState(() {
+            currentView = 'detail';
+            editingTransactionId = null;
+          });
+        },
       );
     }
 

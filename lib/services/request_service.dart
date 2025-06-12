@@ -51,22 +51,28 @@ class RequestService {
     print('[HTTP] ← Status: ${response.statusCode}');
     print('[HTTP] ← Body: ${response.body}');
 
-    T data;
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      T data;
 
-    if (T.toString() == 'void' ||
-        response.statusCode == 204 ||
-        response.body.isEmpty) {
-      data = null as T;
+      if (T.toString() == 'void' ||
+          response.statusCode == 204 ||
+          response.body.isEmpty) {
+        data = null as T;
+      } else {
+        final decoded = jsonDecode(response.body);
+        data = fromJson(decoded);
+      }
+
+      return ApiResponse<T>(
+        data: data,
+        headers: response.headers,
+        statusCode: response.statusCode,
+      );
     } else {
-      final decoded = jsonDecode(response.body);
-      data = fromJson(decoded);
+      throw Exception(
+        '[POST] Request failed → ${response.statusCode}: ${response.body}',
+      );
     }
-
-    return ApiResponse<T>(
-      data: data,
-      headers: response.headers,
-      statusCode: response.statusCode,
-    );
   }
 
   static Future<T> get<T>(
@@ -77,9 +83,25 @@ class RequestService {
     final headers = await _defaultHeaders();
 
     print('[HTTP] → GET $url');
+    print('[HTTP] Headers: $headers');
+
     final response = await http.get(url, headers: headers);
 
-    return _handleResponse(response, fromJson);
+    print('[HTTP] ← Status: ${response.statusCode}');
+    print('[HTTP] ← Body: ${response.body}');
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (T.toString() == 'void' || response.body.isEmpty) {
+        return null as T;
+      }
+
+      final decoded = jsonDecode(response.body);
+      return fromJson(decoded);
+    } else {
+      throw Exception(
+        '[GET] Request failed → ${response.statusCode}: ${response.body}',
+      );
+    }
   }
 
   static Future<ApiResponse<T>> patch<T>(
