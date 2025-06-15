@@ -248,7 +248,7 @@ class IncomeExpenseBarChart extends StatelessWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      interval: maxY / 4,
+                      interval: maxY > 0 ? maxY / 4 : 1,
                       getTitlesWidget: (double value, TitleMeta meta) {
                         return SideTitleWidget(
                           axisSide: meta.axisSide,

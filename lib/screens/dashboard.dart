@@ -5,8 +5,14 @@ import 'package:fintrack/components/cards/dashboard/target_progress_card.dart';
 import 'package:fintrack/components/charts/income_expense_bar_chart.dart';
 import 'package:fintrack/components/headers/default_header.dart';
 import 'package:fintrack/components/overviews/general_overview.dart';
+import 'package:fintrack/models/Category/category.dart';
+import 'package:fintrack/models/Transaction/transaction.dart';
 import 'package:fintrack/models/transaction_item_data.dart';
+import 'package:fintrack/services/CategoryService/category_service.dart';
+import 'package:fintrack/services/TransactionService/transaction_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class DashboardPage extends StatefulWidget {
   final VoidCallback? onCalendarPressed;
@@ -19,6 +25,15 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   int selectedToggleIndex = 2;
+
+  List<TransactionItem> dailyTransactions = [];
+  List<TransactionItem> weeklyTransactions = [];
+  List<TransactionItem> monthlyTransactions = [];
+  List<TransactionItem> yearlyTransactions = [];
+
+  DateTime now = DateTime.now();
+
+  final storage = const FlutterSecureStorage();
 
   Map<String, double> calculateIncomeExpense(
     List<TransactionItemData> transactions,
@@ -42,159 +57,70 @@ class _DashboardPageState extends State<DashboardPage> {
         expense += amount.abs();
       }
     }
-
     return {'income': income, 'expense': expense};
   }
 
-  final List<TransactionItemData> dailyTransactions = [
-    TransactionItemData(
-      icon: Icons.coffee,
-      label: "Coffee",
-      time: "2025-06-02 08:30",
-      category: "Food",
-      amount: "-\$4.50",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.bus_alert,
-      label: "Bus",
-      time: "2025-06-03 08:30",
-      category: "Transport",
-      amount: "-\$3.20",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.bus_alert,
-      label: "Bus",
-      time: "2025-06-03 08:30",
-      category: "Transport",
-      amount: "-\$3.20",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.bus_alert,
-      label: "Bus",
-      time: "2025-06-04 08:30",
-      category: "Transport",
-      amount: "-\$3.20",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.bus_alert,
-      label: "Bus",
-      time: "2025-06-05 08:30",
-      category: "Transport",
-      amount: "-\$3.20",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.bus_alert,
-      label: "Bus",
-      time: "2025-06-06 08:30",
-      category: "Transport",
-      amount: "-\$3.20",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.bus_alert,
-      label: "Bus",
-      time: "2025-06-07 08:30",
-      category: "Transport",
-      amount: "-\$3.20",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.bus_alert,
-      label: "Bus",
-      time: "2025-06-08 08:30",
-      category: "Transport",
-      amount: "-\$3.20",
-      amountColor: Colors.blue,
-    ),
-  ];
+  DateTime getLastSunday(DateTime date) {
+    return date.subtract(Duration(days: date.weekday % 7));
+  }
 
-  final List<TransactionItemData> weeklyTransactions = [
-    TransactionItemData(
-      icon: Icons.shopping_cart,
-      label: "Supermarket",
-      time: "2025-06-03 08:30",
-      category: "Shopping",
-      amount: "-\$150.00",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.restaurant,
-      label: "Lunch",
-      time: "2025-06-08 08:30",
-      category: "Restaurant",
-      amount: "-\$25.00",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.shopping_cart,
-      label: "Supermarket",
-      time: "2025-06-15 08:30",
-      category: "Shopping",
-      amount: "-\$150.00",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.shopping_cart,
-      label: "Supermarket",
-      time: "2025-06-15 08:30",
-      category: "Shopping",
-      amount: "-\$150.00",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.shopping_cart,
-      label: "Supermarket",
-      time: "2025-06-22 08:30",
-      category: "Shopping",
-      amount: "-\$150.00",
-      amountColor: Colors.blue,
-    ),
-  ];
+  Future<void> _loadTransactions() async {
+    try {
+      final storedEmail = await storage.read(key: 'user-mail');
+      if (storedEmail == null) {
+        print('[ERROR] Email do usuário não encontrado no storage');
+        return;
+      }
 
-  final List<TransactionItemData> monthlyTransactions = [
-    TransactionItemData(
-      icon: Icons.payments,
-      label: "Salary",
-      time: "2025-05-03 08:30",
-      category: "Revenue",
-      amount: "\$4,000.00",
-      amountColor: Colors.black,
-    ),
-    TransactionItemData(
-      icon: Icons.home,
-      label: "Rent",
-      time: "2025-06-03 08:30",
-      category: "Fixed Expenses",
-      amount: "-\$674.40",
-      amountColor: Colors.blue,
-    ),
-  ];
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final lastSunday = getLastSunday(today);
+      final fourWeeksAgo = lastSunday.subtract(Duration(days: 28));
+      final sixMonthsAgo = DateTime(today.year, today.month - 5, 1);
+      final fourYearsAgo = DateTime(today.year - 3, 1, 1);
 
-  final List<TransactionItemData> yearlyTransactions = [
-    TransactionItemData(
-      icon: Icons.payments,
-      label: "Annual Bonus",
-      time: "2024-06-03 08:30",
-      category: "Revenue",
-      amount: "\$10,000.00",
-      amountColor: Colors.black,
-    ),
-    TransactionItemData(
-      icon: Icons.home,
-      label: "House Maintenance",
-      time: "2025-06-03 08:30",
-      category: "Fixed Expenses",
-      amount: "-\$6,150.40",
-      amountColor: Colors.blue,
-    ),
-  ];
+      String formatDate(DateTime date) {
+        return '${date.year.toString().padLeft(4, '0')}-'
+            '${date.month.toString().padLeft(2, '0')}-'
+            '${date.day.toString().padLeft(2, '0')}';
+      }
 
-  List<TransactionItemData> getSelectedTransactions() {
+      dailyTransactions = await TransactionService.getTransactionsByPeriod(
+        storedEmail,
+        formatDate(lastSunday),
+        formatDate(today),
+      );
+
+      weeklyTransactions = await TransactionService.getTransactionsByPeriod(
+        storedEmail,
+        formatDate(fourWeeksAgo),
+        formatDate(today),
+      );
+
+      monthlyTransactions = await TransactionService.getTransactionsByPeriod(
+        storedEmail,
+        formatDate(sixMonthsAgo),
+        formatDate(today),
+      );
+
+      yearlyTransactions = await TransactionService.getTransactionsByPeriod(
+        storedEmail,
+        formatDate(fourYearsAgo),
+        formatDate(today),
+      );
+
+      setState(() {});
+    } catch (e) {
+      print('[ERROR] Falha ao carregar transações: $e');
+      Fluttertoast.showToast(
+        msg: 'Erro ao carregar transações',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  List<TransactionItem> getSelectedTransactions() {
     switch (selectedToggleIndex) {
       case 0:
         return dailyTransactions;
@@ -209,6 +135,25 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  Future<List<Category>> getCategories() async {
+    try {
+      final storedEmail = await storage.read(key: 'user-mail');
+      if (storedEmail == null) {
+        print('[ERROR] Email do usuário não encontrado no storage');
+        return [];
+      }
+      return await CategoryService.getCategories(storedEmail);
+    } catch (e) {
+      print('[ERROR] Falha ao carregar categorias: $e');
+      Fluttertoast.showToast(
+        msg: 'Erro ao carregar categorias',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return [];
+    }
+  }
+
   final List<Map<String, dynamic>> selectedTargets = [
     {'percentage': 0.75, 'title': 'Emergency Fund'},
     {'percentage': 0.45, 'title': 'Vacation'},
@@ -218,129 +163,159 @@ class _DashboardPageState extends State<DashboardPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadTransactions();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final selectedTransactions = getSelectedTransactions();
-    final incomeExpense = calculateIncomeExpense(selectedTransactions);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(
-        height: screenHeight,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Color(0xFFDAF7E9)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Column(
-          children: [
-            const DefaultHeader(
-              title: 'Analysis',
-              subtitle: 'Your financial overview',
-              isBackButtonVisible: false,
-              child: GeneralOverview(
-                balance: 7783.00,
-                expense: 1187.40,
-                goal: 20000.00,
-                percentage: 0.3,
+    return FutureBuilder<List<Category>>(
+      future: getCategories(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Erro ao carregar categorias'));
+        }
+
+        final categories = snapshot.data ?? [];
+
+        final transactionDataList =
+            selectedTransactions.map((item) {
+              var category = categories.firstWhere(
+                (cat) => cat.categoryId == item.categoryId,
+                orElse: () => Category(name: 'Unknown', categoryId: 0),
+              );
+              return TransactionItemData.fromApi({
+                'category': {
+                  'categoryId': category.categoryId,
+                  'name': category.name,
+                  'icon': category.icon,
+                },
+                'description': item.description,
+                'transactionDate': item.transactionDate,
+                'type': item.type,
+                'value': item.value,
+              });
+            }).toList();
+
+        final incomeExpense = calculateIncomeExpense(transactionDataList);
+
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Container(
+            height: screenHeight,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.white, Color(0xFFDAF7E9)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-
-                      ToggleButton(
-                        isSelected: List.generate(
-                          4,
-                          (index) => index == selectedToggleIndex,
-                        ),
-                        toggleLabels: const [
-                          "Daily",
-                          "Weekly",
-                          "Monthly",
-                          "Yearly",
-                        ],
-                        onToggle: (index) {
-                          setState(() {
-                            selectedToggleIndex = index;
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      SizedBox(
-                        height: 320,
-                        child: IncomeExpenseBarChart(
-                          transactions: selectedTransactions,
-                          viewType:
-                              const [
-                                "daily",
-                                "weekly",
-                                "monthly",
-                                "yearly",
-                              ][selectedToggleIndex],
-                          onCalendarPressed: widget.onCalendarPressed,
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IncomeCard(incomeExpense: incomeExpense),
-
-                          const SizedBox(width: 16),
-
-                          ExpenseCard(incomeExpense: incomeExpense),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'My Targets',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      Wrap(
-                        spacing: 20,
-                        runSpacing: 20,
-                        alignment:
-                            selectedTargets.length == 1
-                                ? WrapAlignment.center
-                                : WrapAlignment.start,
-                        children:
-                            selectedTargets.map((target) {
-                              return TargetProgressCard(
-                                percentage: target['percentage'],
-                                title: target['title'],
-                              );
-                            }).toList(),
-                      ),
-                    ],
+            child: Column(
+              children: [
+                const DefaultHeader(
+                  title: 'Analysis',
+                  subtitle: 'Your financial overview',
+                  isBackButtonVisible: false,
+                  child: GeneralOverview(
+                    balance: 7783.00,
+                    expense: 1187.40,
+                    goal: 20000.00,
+                    percentage: 0.3,
                   ),
                 ),
-              ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+                          ToggleButton(
+                            isSelected: List.generate(
+                              4,
+                              (index) => index == selectedToggleIndex,
+                            ),
+                            toggleLabels: const [
+                              "Daily",
+                              "Weekly",
+                              "Monthly",
+                              "Yearly",
+                            ],
+                            onToggle: (index) {
+                              setState(() {
+                                selectedToggleIndex = index;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            height: 320,
+                            child: IncomeExpenseBarChart(
+                              transactions: transactionDataList,
+                              viewType:
+                                  [
+                                    'daily',
+                                    'weekly',
+                                    'monthly',
+                                    'yearly',
+                                  ][selectedToggleIndex],
+                              onCalendarPressed: widget.onCalendarPressed,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IncomeCard(incomeExpense: incomeExpense),
+                              const SizedBox(width: 16),
+                              ExpenseCard(incomeExpense: incomeExpense),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'My Targets',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Wrap(
+                            spacing: 20,
+                            runSpacing: 20,
+                            alignment:
+                                selectedTargets.length == 1
+                                    ? WrapAlignment.center
+                                    : WrapAlignment.start,
+                            children:
+                                selectedTargets.map((target) {
+                                  return TargetProgressCard(
+                                    percentage: target['percentage'],
+                                    title: target['title'],
+                                  );
+                                }).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
