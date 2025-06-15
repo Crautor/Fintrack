@@ -1,11 +1,17 @@
 import 'package:fintrack/components/buttons/primary_button.dart';
 import 'package:fintrack/components/headers/default_header.dart';
-import 'package:fintrack/components/inputs/custom_text_field.dart';
 import 'package:fintrack/components/inputs/custom_select_field.dart';
 import 'package:fintrack/components/inputs/custom_radio_group.dart';
+import 'package:fintrack/components/inputs/custom_text_field.dart';
 import 'package:fintrack/components/inputs/date_picker_text_field.dart';
+import 'package:fintrack/models/Category/category.dart';
+import 'package:fintrack/models/Transaction/transaction.dart';
 import 'package:fintrack/models/transaction_item_data.dart';
+import 'package:fintrack/services/CategoryService/category_service.dart';
+import 'package:fintrack/services/TransactionService/transaction_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 class SearchPage extends StatefulWidget {
@@ -16,155 +22,147 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  String searchText = '';
   String? selectedCategory;
   DateTime? selectedDate;
   String? reportType;
-  String searchText = '';
+
+  final storage = const FlutterSecureStorage();
+
+  List<TransactionItem> allTransactions = [];
+  List<Category> allCategories = [];
+
+  List<TransactionItemData> filteredTransactions = [];
   bool searchPerformed = false;
 
   final TextEditingController searchController = TextEditingController();
 
-  List<TransactionItemData> filteredTransactions = [];
-
-  final List<TransactionItemData> dailyTransactions = [
-    TransactionItemData(
-      icon: Icons.coffee,
-      label: "Coffee",
-      time: "2025-06-02 08:30",
-      category: "Food",
-      amount: "-\$4.50",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.bus_alert,
-      label: "Bus",
-      time: "2025-06-03 08:30",
-      category: "Transport",
-      amount: "-\$3.20",
-      amountColor: Colors.blue,
-    ),
-  ];
-
-  final List<TransactionItemData> weeklyTransactions = [
-    TransactionItemData(
-      icon: Icons.shopping_cart,
-      label: "Supermarket",
-      time: "2025-06-03 08:30",
-      category: "Shopping",
-      amount: "-\$150.00",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.restaurant,
-      label: "Lunch",
-      time: "2025-06-08 08:30",
-      category: "Restaurant",
-      amount: "-\$25.00",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.shopping_cart,
-      label: "Supermarket",
-      time: "2025-06-15 08:30",
-      category: "Shopping",
-      amount: "-\$150.00",
-      amountColor: Colors.blue,
-    ),
-  ];
-
-  final List<TransactionItemData> monthlyTransactions = [
-    TransactionItemData(
-      icon: Icons.payments,
-      label: "Salary",
-      time: "2025-05-03 08:30",
-      category: "Revenue",
-      amount: "\$4,000.00",
-      amountColor: Colors.black,
-    ),
-    TransactionItemData(
-      icon: Icons.home,
-      label: "Rent",
-      time: "2025-06-03 08:30",
-      category: "Fixed Expenses",
-      amount: "-\$674.40",
-      amountColor: Colors.blue,
-    ),
-  ];
-
-  final List<TransactionItemData> yearlyTransactions = [
-    TransactionItemData(
-      icon: Icons.payments,
-      label: "Annual Bonus",
-      time: "2024-06-03 08:30",
-      category: "Revenue",
-      amount: "\$10,000.00",
-      amountColor: Colors.black,
-    ),
-    TransactionItemData(
-      icon: Icons.home,
-      label: "House Maintenance",
-      time: "2025-06-03 08:30",
-      category: "Fixed Expenses",
-      amount: "-\$6,150.40",
-      amountColor: Colors.blue,
-    ),
-  ];
-
-  List<TransactionItemData> get allTransactions => [
-    ...dailyTransactions,
-    ...weeklyTransactions,
-    ...monthlyTransactions,
-    ...yearlyTransactions,
-  ];
-
   @override
   void initState() {
     super.initState();
-    filteredTransactions = allTransactions; // Exibe tudo inicialmente
+    _loadCategories();
+    _loadTransactions();
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      final storedEmail = await storage.read(key: 'user-mail');
+      if (storedEmail == null) {
+        Fluttertoast.showToast(
+          msg: 'Usuário não autenticado',
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+        return;
+      }
+      final categories = await CategoryService.getCategories(storedEmail);
+      setState(() {
+        allCategories = categories;
+      });
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Erro ao carregar categorias',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _loadTransactions() async {
+    try {
+      final storedEmail = await storage.read(key: 'user-mail');
+      if (storedEmail == null) {
+        Fluttertoast.showToast(
+          msg: 'Usuário não autenticado',
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+        return;
+      }
+      final transactions = await TransactionService.getTransactionsByPeriod(
+        storedEmail,
+        '2010-01-01',
+        DateFormat('yyyy-MM-dd').format(DateTime.now()),
+      );
+
+      setState(() {
+        allTransactions = transactions;
+        filteredTransactions =
+            allTransactions.map(_mapTransactionToData).toList();
+      });
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Erro ao carregar transações',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  TransactionItemData _mapTransactionToData(TransactionItem tx) {
+    final category = allCategories.firstWhere(
+      (cat) => cat.categoryId == tx.categoryId,
+      orElse: () => Category(name: 'Unknown', categoryId: 0),
+    );
+
+    return TransactionItemData.fromApi({
+      'category': {
+        'categotyId': category.categoryId,
+        'name': category.name,
+        'icon': category.icon,
+      },
+      'description': tx.description,
+      'transactionDate': tx.transactionDate,
+      'type': tx.type,
+      'value': tx.value,
+    });
   }
 
   void filterTransactions() {
     setState(() {
       searchPerformed = true;
+
       filteredTransactions =
-          allTransactions.where((transaction) {
-            final transactionDate = DateTime.parse(transaction.time);
+          allTransactions
+              .where((tx) {
+                final lowerLabel = tx.description?.toLowerCase() ?? '';
+                if (searchText.isNotEmpty &&
+                    !lowerLabel.contains(searchText.toLowerCase())) {
+                  return false;
+                }
 
-            if (searchText.isNotEmpty &&
-                !transaction.label.toLowerCase().contains(
-                  searchText.toLowerCase(),
-                )) {
-              return false;
-            }
+                if (selectedCategory != null && selectedCategory!.isNotEmpty) {
+                  final cat = allCategories.firstWhere(
+                    (cat) => cat.name == selectedCategory,
+                    orElse: () => Category(name: '', categoryId: 0),
+                  );
+                  if (tx.categoryId != cat.categoryId) {
+                    return false;
+                  }
+                }
 
-            if (selectedCategory != null &&
-                selectedCategory!.isNotEmpty &&
-                transaction.category != selectedCategory) {
-              return false;
-            }
+                if (selectedDate != null) {
+                  final txDate = DateTime.parse(tx.transactionDate);
+                  if (!(txDate.year == selectedDate!.year &&
+                      txDate.month == selectedDate!.month &&
+                      txDate.day == selectedDate!.day)) {
+                    return false;
+                  }
+                }
 
-            if (selectedDate != null) {
-              final isSameDay =
-                  transactionDate.year == selectedDate!.year &&
-                  transactionDate.month == selectedDate!.month &&
-                  transactionDate.day == selectedDate!.day;
-              if (!isSameDay) return false;
-            }
+                if (reportType != null) {
+                  final isIncome = tx.type.toString().toLowerCase().contains(
+                    'income',
+                  );
+                  if (reportType == 'Income' && !isIncome) return false;
+                  if (reportType == 'Expense' && isIncome) return false;
+                }
 
-            if (reportType != null) {
-              final isIncome = transaction.amount.startsWith('\$');
-              if (reportType == 'Income' && !isIncome) return false;
-              if (reportType == 'Expense' && isIncome) return false;
-            }
-
-            return true;
-          }).toList();
+                return true;
+              })
+              .map(_mapTransactionToData)
+              .toList();
     });
-  }
-
-  String formatDateTime(String datetimeStr) {
-    final date = DateTime.parse(datetimeStr);
-    return DateFormat('dd/MM/yyyy HH:mm').format(date);
   }
 
   @override
@@ -207,29 +205,15 @@ class _SearchPageState extends State<SearchPage> {
                       const SizedBox(height: 8),
                       CustomSelectField<String>(
                         hintText: 'Select a category',
-                        items: const [
-                          DropdownMenuItem(value: 'Food', child: Text('Food')),
-                          DropdownMenuItem(
-                            value: 'Transport',
-                            child: Text('Transport'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'Shopping',
-                            child: Text('Shopping'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'Restaurant',
-                            child: Text('Restaurant'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'Revenue',
-                            child: Text('Revenue'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'Fixed Expenses',
-                            child: Text('Fixed Expenses'),
-                          ),
-                        ],
+                        items:
+                            allCategories
+                                .map(
+                                  (cat) => DropdownMenuItem<String>(
+                                    value: cat.name,
+                                    child: Text(cat.name),
+                                  ),
+                                )
+                                .toList(),
                         value: selectedCategory,
                         onChanged: (value) {
                           setState(() {
@@ -282,7 +266,7 @@ class _SearchPageState extends State<SearchPage> {
                             ),
                             title: Text(transaction.label),
                             subtitle: Text(
-                              '${transaction.category} • ${formatDateTime(transaction.time)}',
+                              '${transaction.category} • ${transaction.labelTime}',
                             ),
                             trailing: Text(
                               transaction.amount,
