@@ -74,11 +74,7 @@ class _CalendarPageState extends State<CalendarPage> {
         return;
       }
 
-      final transactions = await TransactionService.getTransactionsByPeriod(
-        storedEmail,
-        '2010-01-01',
-        DateFormat('yyyy-MM-dd').format(DateTime.now()),
-      );
+      final transactions = await TransactionService.getAll(storedEmail);
 
       List<TransactionItem> converted =
           transactions.map((tx) {

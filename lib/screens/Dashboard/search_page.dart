@@ -12,7 +12,6 @@ import 'package:fintrack/services/TransactionService/transaction_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:intl/intl.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -79,11 +78,7 @@ class _SearchPageState extends State<SearchPage> {
         );
         return;
       }
-      final transactions = await TransactionService.getTransactionsByPeriod(
-        storedEmail,
-        '2010-01-01',
-        DateFormat('yyyy-MM-dd').format(DateTime.now()),
-      );
+      final transactions = await TransactionService.getAll(storedEmail);
 
       setState(() {
         allTransactions = transactions;
