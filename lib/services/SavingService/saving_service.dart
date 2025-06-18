@@ -15,13 +15,13 @@ class SavingService {
     return items.map((item) => Saving.fromJson(item)).toList();
   }
 
-  static Future<Saving> getById(int id) async {
+  static Future<Saving> getById(int id, String email) async {
     final response = await RequestService.get<Map<String, dynamic>>(
-      '$endpoint/$id',
+      '$endpoint/$id?email=$email',
       (json) => json,
     );
 
-    return Saving.fromJson(response['item']);
+    return Saving.fromJson(response);
   }
 
   static Future<ApiResponse<void>> create(Saving saving) async {
@@ -34,5 +34,24 @@ class SavingService {
 
   static Future<ApiResponse<void>> delete(int id) async {
     return await RequestService.delete<void>('$endpoint/$id', (_) {});
+  }
+
+  static Future<List<Saving>> getByFinancialGoal({
+    required String email,
+    required int financialGoalId,
+  }) async {
+    final response = await RequestService.get<Map<String, dynamic>>(
+      '$endpoint/find/goal?email=$email&financialGoalId=$financialGoalId',
+      (json) => json,
+    );
+
+    // Filtrar apenas chaves numéricas (0, 1, 2...) que representam savings
+    final savings =
+        response.entries
+            .where((entry) => int.tryParse(entry.key) != null)
+            .map((entry) => Saving.fromJson(entry.value))
+            .toList();
+
+    return savings;
   }
 }

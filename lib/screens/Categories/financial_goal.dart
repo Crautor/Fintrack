@@ -1,9 +1,13 @@
 import 'package:fintrack/components/inputs/custom_text_field.dart';
 import 'package:fintrack/components/inputs/custom_icon_picker_field.dart';
+import 'package:fintrack/components/inputs/date_picker_text_field.dart';
+import 'package:fintrack/components/selects/custom_select.dart';
 import 'package:flutter/material.dart';
 import 'package:fintrack/utils/icons.dart';
 import 'package:fintrack/models/Financial_Goal/financial_goal.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+enum FinancialGoalStatus { Aberto, Em_Andamento, Expirado, Concluido }
 
 class FinancialGoalModal extends StatefulWidget {
   final void Function(FinancialGoal) onSave;
@@ -19,6 +23,8 @@ class _FinancialGoalModalState extends State<FinancialGoalModal> {
   final TextEditingController _valueController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   CategoryIcon? _selectedIcon;
+  FinancialGoalStatus? _selectedStatus;
+  DateTime? _selectedDate;
 
   @override
   Widget build(BuildContext context) {
@@ -46,14 +52,41 @@ class _FinancialGoalModalState extends State<FinancialGoalModal> {
               ),
               const SizedBox(height: 20),
               CustomTextField(
-                hintText: 'Descrição...',
-                controller: _descriptionController,
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
                 hintText: 'Valor da meta (R\$)',
                 controller: _valueController,
                 keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: CustomSelect<FinancialGoalStatus>(
+                  hintText: 'Selecione o status',
+                  items: FinancialGoalStatus.values,
+                  value: _selectedStatus,
+                  onChanged: (newValue) {
+                    setState(() => _selectedStatus = newValue);
+                  },
+                  getLabel: (status) {
+                    switch (status) {
+                      case FinancialGoalStatus.Aberto:
+                        return 'Aberto';
+                      case FinancialGoalStatus.Em_Andamento:
+                        return 'Em andamento';
+                      case FinancialGoalStatus.Expirado:
+                        return 'Expirado';
+                      case FinancialGoalStatus.Concluido:
+                        return 'Concluído';
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              DatePickerField(
+                hintText: 'Data limite',
+                initialDate: _selectedDate,
+                onDateSelected: (picked) {
+                  setState(() => _selectedDate = picked);
+                },
               ),
               const SizedBox(height: 20),
               CustomIconPickerField(
@@ -69,35 +102,26 @@ class _FinancialGoalModalState extends State<FinancialGoalModal> {
 
                   if (title.isNotEmpty &&
                       value != null &&
-                      _selectedIcon != null) {
+                      _selectedIcon != null &&
+                      _selectedStatus != null &&
+                      _selectedDate != null) {
                     final storage = FlutterSecureStorage();
-                    final userId = await storage.read(key: 'user-mail');
-
-                    // if (userId == null) {
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     const SnackBar(
-                    //       content: Text(
-                    //         'Usuário não encontrado. Faça login novamente.',
-                    //       ),
-                    //       backgroundColor: Colors.red,
-                    //     ),
-                    //   );
-                    //   return;
-                    // }
+                    final userMail = await storage.read(key: 'user-mail');
 
                     final goal = FinancialGoal(
                       title: title,
                       value: value,
                       description: description,
-                      iconId: _selectedIcon!.id,
-                      // userId: userId,
+                      email: userMail,
+                      status: _selectedStatus.toString().split('.').last,
+                      limitDate: _selectedDate!.toUtc().toIso8601String(),
+                      icon: _selectedIcon!.id,
                     );
 
                     widget.onSave(goal);
                     if (context.mounted) Navigator.pop(context);
                   }
                 },
-
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00C49A),
                   shape: RoundedRectangleBorder(

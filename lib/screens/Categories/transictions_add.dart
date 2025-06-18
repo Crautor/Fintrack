@@ -67,26 +67,20 @@ class _AddTransictionsScreenState extends State<AddTransictionsScreen> {
   Future<void> _handleDelete() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Remover Transação'),
-            content: const Text(
-              'Tem certeza que deseja remover esta transação?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(
-                  'Remover',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text('Remover Transação'),
+        content: const Text('Tem certeza que deseja remover esta transação?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Remover', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
 
     if (confirm != true) return;
@@ -116,10 +110,9 @@ class _AddTransictionsScreenState extends State<AddTransictionsScreen> {
         child: Column(
           children: [
             FormHeader(
-              title:
-                  widget.transactionId != null
-                      ? 'Editar Transação'
-                      : 'Adicionar Transação',
+              title: widget.transactionId != null
+                  ? 'Editar Transação'
+                  : 'Adicionar Transação',
               onBack: widget.onBack,
             ),
             Expanded(
@@ -155,6 +148,21 @@ class _AddTransictionsScreenState extends State<AddTransictionsScreen> {
                       ),
                       const SizedBox(height: 16),
 
+                      CustomRadioGroup<String>(
+                        label: 'Tipo',
+                        selectedValue: type,
+                        onChanged: (value) {
+                          setState(() {
+                            type = value;
+                          });
+                        },
+                        options: const [
+                          CustomRadioOption(label: 'Receita', value: '1'),
+                          CustomRadioOption(label: 'Despesa', value: '2'),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
                       const FormLabel("Data"),
                       DatePickerField(
                         hintText: 'Selecione a data',
@@ -167,7 +175,7 @@ class _AddTransictionsScreenState extends State<AddTransictionsScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      const FormLabel("Título da Despesa"),
+                      const FormLabel("Título da Transação"),
                       CustomTextField(
                         hintText: 'Informe um título',
                         controller: messageController,
@@ -176,7 +184,7 @@ class _AddTransictionsScreenState extends State<AddTransictionsScreen> {
 
                       const FormLabel("Valor"),
                       CustomTextField(
-                        hintText: 'R\$ Informe o valor gasto',
+                        hintText: 'Informe o tipo de transação',
                         controller: amountController,
                         keyboardType: TextInputType.number,
                       ),
@@ -217,40 +225,34 @@ class _AddTransictionsScreenState extends State<AddTransictionsScreen> {
                           }
 
                           try {
-                            final storedEmail = await storage.read(
-                              key: 'user-mail',
-                            );
+                            final storedEmail = await storage.read(key: 'user-mail');
                             if (storedEmail == null) return;
 
                             final transaction = TransactionItem(
                               transactionId: widget.transactionId,
-                              value:
-                                  double.tryParse(
+                              value: double.tryParse(
                                     amountController.text.replaceAll(',', '.'),
                                   ) ??
                                   0.0,
                               categoryId: widget.categoryId,
-                              transactionDate:
-                                  selectedDate!.toUtc().toIso8601String(),
+                              transactionDate: selectedDate!.toUtc().toIso8601String(),
                               description: messageController.text,
                               recurrence: recurrence == 'Monthly',
-                              type: 'Expense',
+                              type: type == '1' ? 'Income' : 'Expense',
                               email: storedEmail,
                             );
 
                             final transactionUpdate = TransactionItem(
                               transactionId: widget.transactionId,
-                              value:
-                                  double.tryParse(
+                              value: double.tryParse(
                                     amountController.text.replaceAll(',', '.'),
                                   ) ??
                                   0.0,
                               categoryId: widget.categoryId,
-                              transactionDate:
-                                  selectedDate!.toUtc().toIso8601String(),
+                              transactionDate: selectedDate!.toUtc().toIso8601String(),
                               description: messageController.text,
                               recurrence: recurrence == 'Monthly',
-                              type: 'Expense',
+                              type: type == '1' ? 'Income' : 'Expense',
                             );
 
                             if (widget.transactionId != null) {
@@ -259,9 +261,7 @@ class _AddTransictionsScreenState extends State<AddTransictionsScreen> {
                                 transactionUpdate,
                               );
                             } else {
-                              await TransactionService.createTransaction(
-                                transaction,
-                              );
+                              await TransactionService.createTransaction(transaction);
                             }
 
                             Fluttertoast.showToast(

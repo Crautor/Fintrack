@@ -28,9 +28,9 @@ class FinancialGoalService {
     return await RequestService.delete<void>('$endpoint/$id', (_) {});
   }
 
-  static Future<FinancialGoal> getById(int id) async {
+  static Future<FinancialGoal> getById(int id, String email) async {
     return await RequestService.get<FinancialGoal>(
-      '$endpoint/$id',
+      '$endpoint/$id?email=$email',
       FinancialGoal.fromJson,
     );
   }
