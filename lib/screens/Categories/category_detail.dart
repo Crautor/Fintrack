@@ -162,17 +162,19 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
         getCategoryIconById(int.tryParse(category!.icon ?? '') ?? 0)?.icon ??
         Icons.help_outline;
 
-    final categoryTotal = transactions.fold<double>(
-      0.0,
-      (sum, item) => sum + item.value,
-    );
+    final incomeTotal = transactions
+        .where((item) => item.type == 'Income')
+        .fold<double>(0.0, (sum, item) => sum + item.value);
 
-    final overallTotal = allTransactions.fold<double>(
-      0.0,
-      (sum, item) => sum + item.value,
-    );
+    final expenseTotal = transactions
+        .where((item) => item.type == 'Expense')
+        .fold<double>(0.0, (sum, item) => sum + item.value);
 
-    final percentage = overallTotal > 0 ? categoryTotal / overallTotal : 0.0;
+    final totalBalance = allTransactions
+        .where((item) => item.type == 'Income')
+        .fold<double>(0.0, (sum, item) => sum + item.value);
+
+    final percentage = totalBalance > 0 ? expenseTotal / totalBalance : 0.0;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4FFFB),
@@ -202,7 +204,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                               icon: updatedIcon.id.toString(),
                             ),
                           );
-                          await loadData(); // Atualiza após edição
+                          widget.onBack?.call();
                         },
                       );
                     },
@@ -210,12 +212,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                 },
               ),
             ],
-            child: GeneralOverview(
-              balance: overallTotal,
-              expense: categoryTotal,
-              percentage: percentage,
-              goal: 0,
-            ),
+            child: GeneralOverview(balance: incomeTotal, expense: expenseTotal),
           ),
           const SizedBox(height: 12),
           Expanded(
@@ -296,6 +293,10 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
             ? "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}"
             : "Data inválida";
 
+    final isIncome = item.type == 'Income';
+    final valueColor =
+        isIncome ? const Color(0xFF00D084) : const Color(0xFF187DFE);
+    final valuePrefix = isIncome ? '+R\$' : '-R\$';
     return GestureDetector(
       onTap: () {
         if (widget.onEditTransaction != null && item.transactionId != null) {
@@ -335,12 +336,10 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                 ],
               ),
             ),
+
             Text(
-              "-R\$${item.value.toStringAsFixed(2)}",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF187DFE),
-              ),
+              "$valuePrefix${item.value.toStringAsFixed(2)}",
+              style: TextStyle(fontWeight: FontWeight.bold, color: valueColor),
             ),
           ],
         ),

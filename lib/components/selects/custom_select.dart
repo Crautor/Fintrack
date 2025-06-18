@@ -7,6 +7,7 @@ class CustomSelect<T> extends StatelessWidget {
   final List<T> items;
   final T? value;
   final ValueChanged<T?> onChanged;
+  final String Function(T)? getLabel;
 
   const CustomSelect({
     super.key,
@@ -15,6 +16,7 @@ class CustomSelect<T> extends StatelessWidget {
     required this.items,
     required this.value,
     required this.onChanged,
+    this.getLabel,
   });
 
   @override
@@ -31,6 +33,7 @@ class CustomSelect<T> extends StatelessWidget {
           ),
           child: DropdownButtonFormField<T>(
             value: value,
+            isExpanded: true,
             hint: Text(
               hintText,
               style: const TextStyle(color: Color(0xFF093030)),
@@ -40,12 +43,13 @@ class CustomSelect<T> extends StatelessWidget {
               fontSize: 16,
               fontWeight: FontWeight.normal,
             ),
-
             items:
                 items.map((item) {
+                  final label =
+                      getLabel != null ? getLabel!(item) : item.toString();
                   return DropdownMenuItem<T>(
                     value: item,
-                    child: Text(item.toString()),
+                    child: Text(label, overflow: TextOverflow.ellipsis),
                   );
                 }).toList(),
             onChanged: onChanged,

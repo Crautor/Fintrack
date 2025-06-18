@@ -15,8 +15,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class CategoriesPage extends StatefulWidget {
   final VoidCallback? onAddPressed;
   final void Function(Map<String, dynamic>)? onCategoryPressed;
+  final void Function(Map<String, dynamic>)? onGoalPressed;
 
-  const CategoriesPage({super.key, this.onAddPressed, this.onCategoryPressed});
+  const CategoriesPage({
+    super.key,
+    this.onAddPressed,
+    this.onCategoryPressed,
+    this.onGoalPressed,
+  });
 
   @override
   State<CategoriesPage> createState() => _CategoriesPageState();
@@ -133,7 +139,7 @@ class _CategoriesPageState extends State<CategoriesPage>
           children: [
             const DefaultHeader(
               title: 'Categorias',
-              subtitle: 'Gerencie suas despesas',
+              subtitle: 'Gerencie suas despesas e metas.',
               isBackButtonVisible: false,
               child: GeneralOverview(
                 balance: 7783.00,
@@ -212,16 +218,18 @@ class _CategoriesPageState extends State<CategoriesPage>
           childAspectRatio: 0.8,
           children: [
             ...financialGoals.map((goal) {
+              final iconData =
+                  goal.icon != null
+                      ? getCategoryIconById(goal.icon!)?.icon
+                      : Icons.flag;
+
               return CategoryItem(
-                icon: Icons.flag,
+                icon: iconData ?? Icons.flag,
                 label: goal.title,
-                onTap: () {
-                  Fluttertoast.showToast(
-                    msg:
-                        'Meta: R\$ ${goal.value.toStringAsFixed(2)} - Status: ${goal.status}',
-                    backgroundColor: Colors.green,
-                  );
-                },
+                onTap:
+                    () => widget.onGoalPressed?.call({
+                      "id": goal.financialGoalId,
+                    }),
               );
             }),
             CategoryItem(

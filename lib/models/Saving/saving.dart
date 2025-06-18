@@ -1,11 +1,12 @@
 class Saving {
   final int? savingId;
-  final int? userId;
+  final String? userId;
   final double value;
   final int financialGoalId;
   final String? description;
   final String title;
-  final int iconId;
+  final String? email;
+  final String? createdAt;
 
   Saving({
     this.savingId,
@@ -14,28 +15,41 @@ class Saving {
     required this.financialGoalId,
     this.description,
     required this.title,
-    required this.iconId,
+    this.email,
+    this.createdAt,
   });
 
   factory Saving.fromJson(Map<String, dynamic> json) {
     return Saving(
-      savingId: json['savingId'],
-      userId: json['userId'],
+      savingId: json['savingId'] as int?,
+      userId: json['userId'] as String?,
       value: (json['value'] as num).toDouble(),
-      financialGoalId: json['financialGoalId'],
-      description: json['description'],
-      title: json['title'],
-      iconId: json['iconId'],
+      financialGoalId: json['financialGoalId'] as int,
+      description: json['description'] as String?,
+      title: json['title'] as String,
+      email: json['email'] as String?,
+      createdAt: json['createdAt'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'value': value,
-      'financialGoalId': financialGoalId,
-      'description': description,
-      'title': title,
-      'iconId': iconId,
-    };
+    if (email == null) {
+      return {
+        'value': value,
+        'financialGoalId': financialGoalId,
+        'description': description,
+        'title': title,
+        'createdAt': createdAt,
+      };
+    } else {
+      return {
+        'value': value,
+        'financialGoalId': financialGoalId,
+        'description': description,
+        'title': title,
+        'email': email,
+        'createdAt': createdAt,
+      };
+    }
   }
 }

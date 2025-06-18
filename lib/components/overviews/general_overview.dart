@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 class GeneralOverview extends StatelessWidget {
   final double balance;
   final double expense;
-  final double goal;
-  final double percentage;
+  final double? goal;
+  final double? percentage;
 
   const GeneralOverview({
     super.key,
     required this.balance,
     required this.expense,
-    required this.goal,
-    required this.percentage,
+    this.goal,
+    this.percentage,
   });
 
   @override
@@ -36,7 +36,7 @@ class GeneralOverview extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "\$${balance.toStringAsFixed(2)}",
+                    "R\$${balance.toStringAsFixed(2)}",
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class GeneralOverview extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "-\$${expense.toStringAsFixed(2)}",
+                    "-R\$${expense.toStringAsFixed(2)}",
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -80,56 +80,56 @@ class GeneralOverview extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  Container(
-                    height: 18,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                  ),
-
-                  FractionallySizedBox(
-                    widthFactor: percentage,
-                    child: Container(
+        if (percentage != null && goal != null) ...[
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Stack(
+                  children: [
+                    Container(
                       height: 18,
+                      width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.black,
+                        color: Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                  ),
-
-                  FractionallySizedBox(
-                    widthFactor: percentage,
-                    child: Container(
-                      height: 18,
-                      alignment: Alignment.center,
-                      child: Text(
-                        "${(percentage * 100).toStringAsFixed(0)}%",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                    FractionallySizedBox(
+                      widthFactor: percentage!.clamp(0.0, 1.0),
+                      child: Container(
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(25),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    FractionallySizedBox(
+                      widthFactor: percentage!.clamp(0.0, 1.0),
+                      child: Container(
+                        height: 18,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${(percentage! * 100).toStringAsFixed(0)}%",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              "\$${goal.toStringAsFixed(2)}",
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+              const SizedBox(width: 8),
+              Text(
+                "R\$${(goal ?? 0).toStringAsFixed(2)}",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }

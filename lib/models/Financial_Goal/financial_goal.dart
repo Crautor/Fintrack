@@ -6,7 +6,7 @@ class FinancialGoal {
   final String? status;
   final String title;
   final String? description;
-  final int? iconId;
+  final int? icon;
   final String? email;
 
   FinancialGoal({
@@ -17,7 +17,7 @@ class FinancialGoal {
     this.status,
     required this.title,
     this.description,
-    this.iconId,
+    this.icon,
     this.email,
   });
 
@@ -30,6 +30,7 @@ class FinancialGoal {
       status: json['status'] ?? 'pending',
       title: json['title'],
       description: json['description'],
+      icon: json['icon'] != null ? int.parse(json['icon'].toString()) : null,
     );
   }
 
@@ -42,6 +43,7 @@ class FinancialGoal {
       'status': status,
       'title': title,
       'description': description,
+      'icon': icon,
     };
   }
 
