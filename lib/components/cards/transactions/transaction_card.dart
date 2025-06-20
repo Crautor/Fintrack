@@ -1,7 +1,6 @@
 import 'package:fintrack/models/Transaction/list_transaction.dart';
 import 'package:flutter/material.dart';
 
-
 class TransactionCard extends StatelessWidget {
   final TransactionItem item;
 
@@ -28,18 +27,13 @@ class TransactionCard extends StatelessWidget {
             children: [
               Text(
                 item.title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
                 '${item.time} – ${item.date}',
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
-              Text(
-                item.category,
-                style: const TextStyle(fontSize: 12),
-              ),
+              Text(item.category, style: const TextStyle(fontSize: 12)),
             ],
           ),
         ),

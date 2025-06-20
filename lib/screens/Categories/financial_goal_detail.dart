@@ -59,7 +59,7 @@ class _FinancialGoalDetailPageState extends State<FinancialGoalDetailPage> {
         userEmail,
       );
 
-      if (mounted && fetchedGoal != null) {
+      if (mounted) {
         setState(() => goal = fetchedGoal);
       }
     } catch (e, stack) {

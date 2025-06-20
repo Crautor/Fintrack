@@ -56,9 +56,6 @@ class _SearchPageState extends State<SearchPage> {
         return;
       }
       var categories = await CategoryService.getCategories(storedEmail);
-      if (categories.isEmpty) {
-        categories = getAllDefaultCategories();
-      }
       setState(() {
         allCategories = categories;
       });
@@ -100,13 +97,23 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   TransactionItemData _mapTransactionToData(TransactionItem tx) {
-    final category = getCategoryIconById(tx.categoryId);
+    final category = allCategories.firstWhere(
+      (cat) => cat.categoryId == tx.categoryId,
+      orElse:
+          () => Category(
+            categoryId: tx.categoryId,
+            name: 'Categoria Desconhecida',
+            icon: '0',
+          ),
+    );
+
+    final categoryIcon = getCategoryIconById(tx.categoryId)?.icon;
 
     return TransactionItemData.fromApi({
       'category': {
-        'categotyId': category?.id ?? 0,
-        'name': category?.label ?? 'Desconhecido',
-        'icon': category?.icon ?? Icons.help_outline,
+        'categotyId': category.categoryId ?? 0,
+        'name': category.name,
+        'icon': categoryIcon ?? Icons.help_outline,
       },
       'description': tx.description,
       'transactionDate': tx.transactionDate,

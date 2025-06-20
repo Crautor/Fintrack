@@ -170,12 +170,6 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
         .where((item) => item.type == 'Expense')
         .fold<double>(0.0, (sum, item) => sum + item.value);
 
-    final totalBalance = allTransactions
-        .where((item) => item.type == 'Income')
-        .fold<double>(0.0, (sum, item) => sum + item.value);
-
-    final percentage = totalBalance > 0 ? expenseTotal / totalBalance : 0.0;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF4FFFB),
       body: Column(

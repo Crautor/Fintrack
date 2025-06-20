@@ -1,4 +1,3 @@
-import 'package:fintrack/utils/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -25,15 +24,11 @@ class TransactionItemData {
     final parsed = DateTime.tryParse(json['transactionDate']!);
 
     return TransactionItemData(
-      icon:
-          getCategoryIconById(json['category']['categotyId'] ?? 0)?.icon ??
-          Icons.help,
-      label:
-          getCategoryIconById(json['category']['categotyId'] ?? 0)?.label ??
-          'Descrição não informada',
+      icon: json['category']['icon'] ?? Icons.help_outline,
+      label: json['description'] ?? 'Sem descrição',
       labelTime:
           parsed != null
-              ? DateFormat('dd/MM/yyyy HH:mm').format(parsed.toLocal())
+              ? DateFormat('dd/MM/yyyy - HH:mm').format(parsed.toLocal())
               : '',
       time: parsed?.toString().split(' ').first ?? '',
       category: json['category']['name'] ?? '',

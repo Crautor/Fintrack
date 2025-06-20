@@ -2,99 +2,59 @@ import 'package:fintrack/components/headers/default_header.dart';
 import 'package:fintrack/components/overviews/general_overview.dart';
 import 'package:fintrack/components/overviews/last_week_overview.dart';
 import 'package:fintrack/components/tables/transaction_section.dart';
+import 'package:fintrack/models/Category/category.dart';
+import 'package:fintrack/models/Transaction/transaction.dart';
 import 'package:fintrack/models/transaction_item_data.dart';
+import 'package:fintrack/services/CategoryService/category_service.dart';
+import 'package:fintrack/services/TransactionService/transaction_service.dart';
+import 'package:fintrack/services/SavingService/saving_service.dart';
+import 'package:fintrack/services/FinancialGoalService/financial_goal_service.dart';
+import 'package:fintrack/utils/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  static final GlobalKey<_HomePageState> globalKey = GlobalKey();
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final Color mainGreen = const Color(0xFF00D084);
-  final Color lightGreen = const Color(0xFFDAF7E9);
   int selectedToggleIndex = 2;
+  bool isLoading = true;
 
-  final List<TransactionItemData> dailyTransactions = [
-    TransactionItemData(
-      icon: Icons.coffee,
-      label: "Coffee",
-      time: "08:30 - April 10",
-      category: "Food",
-      amount: "-\$4.50",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.bus_alert,
-      label: "Bus",
-      time: "09:00 - April 10",
-      category: "Transport",
-      amount: "-\$3.20",
-      amountColor: Colors.blue,
-    ),
-  ];
+  final FlutterSecureStorage storage = const FlutterSecureStorage();
 
-  final List<TransactionItemData> weeklyTransactions = [
-    TransactionItemData(
-      icon: Icons.shopping_cart,
-      label: "Supermarket",
-      time: "17:00 - April 08",
-      category: "Shopping",
-      amount: "-\$150.00",
-      amountColor: Colors.blue,
-    ),
-    TransactionItemData(
-      icon: Icons.restaurant,
-      label: "Lunch",
-      time: "12:30 - April 07",
-      category: "Restaurant",
-      amount: "-\$25.00",
-      amountColor: Colors.blue,
-    ),
-  ];
+  List<Category> allCategories = [];
 
-  final List<TransactionItemData> monthlyTransactions = [
-    TransactionItemData(
-      icon: Icons.payments,
-      label: "Salary",
-      time: "18:27 - April 01",
-      category: "Revenue",
-      amount: "\$4000.00",
-      amountColor: Colors.black,
-    ),
-    TransactionItemData(
-      icon: Icons.home,
-      label: "Rent",
-      time: "08:30 - April 05",
-      category: "Fixed Expenses",
-      amount: "-\$674.40",
-      amountColor: Colors.blue,
-    ),
-  ];
+  List<TransactionItem> dailyTransactions = [];
+  List<TransactionItem> weeklyTransactions = [];
+  List<TransactionItem> monthlyTransactions = [];
 
-  List<TransactionItemData> getSelectedTransactions() {
-    switch (selectedToggleIndex) {
-      case 0:
-        return dailyTransactions;
-      case 1:
-        return weeklyTransactions;
-      case 2:
-      default:
-        return monthlyTransactions;
-    }
-  }
+  double totalIncome = 0;
+  double totalExpense = 0;
+
+  double lastWeekIncome = 0;
+  double lastWeekExpense = 0;
+  double goalPercentage = 0.0;
 
   @override
   void initState() {
     super.initState();
     _loadAndPrintAuthInfo();
+    _loadCategories();
+    _loadTransactions();
+  }
+
+  void refreshData() {
+    _loadTransactions();
   }
 
   Future<void> _loadAndPrintAuthInfo() async {
-    print('[DEBUG] Iniciando leitura dos tokens...');
     final storage = FlutterSecureStorage();
     final token = await storage.read(key: 'auth_token');
     final storedEmail = await storage.read(key: 'user-mail');
@@ -103,69 +63,207 @@ class _HomePageState extends State<HomePage> {
     print('[DEBUG] user-mail: $storedEmail');
   }
 
+  Future<void> _loadCategories() async {
+    try {
+      final storedEmail = await storage.read(key: 'user-mail');
+      if (storedEmail == null) {
+        Fluttertoast.showToast(
+          msg: 'Usuário não autenticado',
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+        return;
+      }
+      final categories = await CategoryService.getCategories(storedEmail);
+      setState(() {
+        allCategories = categories;
+      });
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Erro ao carregar categorias',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _loadTransactions() async {
+    setState(() => isLoading = true);
+
+    final storage = FlutterSecureStorage();
+    final storedEmail = await storage.read(key: 'user-mail');
+    if (storedEmail == null) return;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final lastSunday = today.subtract(Duration(days: today.weekday % 7));
+    final startOfMonth = DateTime(today.year, today.month, 1);
+
+    String formatDate(DateTime date) =>
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+    dailyTransactions = await TransactionService.getTransactionsByPeriod(
+      storedEmail,
+      formatDate(today),
+      formatDate(today),
+    );
+
+    weeklyTransactions = await TransactionService.getTransactionsByPeriod(
+      storedEmail,
+      formatDate(lastSunday),
+      formatDate(today),
+    );
+
+    monthlyTransactions = await TransactionService.getTransactionsByPeriod(
+      storedEmail,
+      formatDate(startOfMonth),
+      formatDate(today),
+    );
+
+    final lastWeekStart = lastSunday.subtract(const Duration(days: 7));
+    final lastWeekEnd = lastSunday.subtract(const Duration(days: 1));
+
+    final lastWeekTransactions =
+        await TransactionService.getTransactionsByPeriod(
+          storedEmail,
+          formatDate(lastWeekStart),
+          formatDate(lastWeekEnd),
+        );
+
+    lastWeekIncome = 0;
+    lastWeekExpense = 0;
+
+    for (var tx in lastWeekTransactions) {
+      if (tx.type == 'Income') {
+        lastWeekIncome += tx.value;
+      } else {
+        lastWeekExpense += tx.value;
+      }
+    }
+
+    final savings = await SavingService.getAll(storedEmail);
+    final goals = await FinancialGoalService.getAll(storedEmail);
+
+    final totalSavings = savings.fold<double>(0, (sum, s) => sum + s.value);
+    final totalGoals = goals.fold<double>(0, (sum, g) => sum + g.value);
+
+    goalPercentage =
+        (totalGoals > 0) ? (totalSavings / totalGoals).clamp(0.0, 1.0) : 0.0;
+
+    setState(() => isLoading = false);
+  }
+
+  List<TransactionItemData> getSelectedTransactions() {
+    totalIncome = 0;
+    totalExpense = 0;
+
+    List<TransactionItem> selected;
+    switch (selectedToggleIndex) {
+      case 0:
+        selected = dailyTransactions;
+        break;
+      case 1:
+        selected = weeklyTransactions;
+        break;
+      case 2:
+      default:
+        selected = monthlyTransactions;
+    }
+
+    return selected.map((tx) {
+      if (tx.type == 'Income') {
+        totalIncome += tx.value;
+      } else {
+        totalExpense += tx.value;
+      }
+
+      final category = allCategories.firstWhere(
+        (cat) => cat.categoryId == tx.categoryId,
+        orElse:
+            () => Category(
+              categoryId: tx.categoryId,
+              name: 'Categoria Desconhecida',
+              icon: '0',
+            ),
+      );
+
+      final categoryIcon = getCategoryIconById(tx.categoryId)?.icon;
+
+      return TransactionItemData.fromApi({
+        'category': {
+          'categotyId': category.categoryId ?? 0,
+          'name': category.name,
+          'icon': categoryIcon ?? Icons.help_outline,
+        },
+        'description': tx.description,
+        'transactionDate': tx.transactionDate,
+        'type': tx.type,
+        'value': tx.value,
+      });
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Container(
-        height: screenHeight,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Color(0xFFDAF7E9)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Column(
-          children: [
-            const DefaultHeader(
-              title: 'Olá, Bem-vindo ao FinTrack!',
-              subtitle: 'Gerencie suas finanças',
-              isBackButtonVisible: false,
-              child: GeneralOverview(
-                balance: 7783.00,
-                expense: 1187.40,
-                goal: 20000.00,
-                percentage: 0.3,
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-                      LastWeekOverview(
-                        revenue: 4000.00,
-                        expense: 100.00,
-                        goalPercentage: 0.5,
-                      ),
-                      const SizedBox(height: 20),
-                      TransactionSection(
-                        toggleLabels: ["Diária", "Semanal", "Mensal"],
-                        isSelected: List.generate(
-                          3,
-                          (index) => index == selectedToggleIndex,
-                        ),
-                        onToggle: (index) {
-                          setState(() {
-                            selectedToggleIndex = index;
-                          });
-                        },
-                        transactions: getSelectedTransactions(),
-                      ),
-                    ],
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Container(
+                height: screenHeight,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.white, Color(0xFFDAF7E9)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
                 ),
+                child: Column(
+                  children: [
+                    const DefaultHeader(
+                      title: 'Olá, Bem-vindo ao FinTrack!',
+                      subtitle: 'Gerencie suas finanças',
+                      isBackButtonVisible: false,
+                      child: GeneralOverview(),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 20),
+                              LastWeekOverview(
+                                revenue: lastWeekIncome,
+                                expense: lastWeekExpense,
+                                goalPercentage: goalPercentage,
+                              ),
+                              const SizedBox(height: 20),
+                              TransactionSection(
+                                toggleLabels: ["Diária", "Semanal", "Mensal"],
+                                isSelected: List.generate(
+                                  3,
+                                  (index) => index == selectedToggleIndex,
+                                ),
+                                onToggle: (index) {
+                                  setState(() {
+                                    selectedToggleIndex = index;
+                                  });
+                                },
+                                transactions: getSelectedTransactions(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
