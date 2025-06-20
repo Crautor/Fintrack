@@ -5,9 +5,9 @@ import 'package:fintrack/services/request_service.dart';
 class SavingService {
   static const String endpoint = 'savings';
 
-  static Future<List<Saving>> getAll() async {
+  static Future<List<Saving>> getAll(String email) async {
     final response = await RequestService.get<Map<String, dynamic>>(
-      endpoint,
+      '$endpoint?email=$email',
       (json) => json,
     );
 

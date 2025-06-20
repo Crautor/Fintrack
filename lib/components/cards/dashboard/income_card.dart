@@ -31,12 +31,12 @@ class IncomeCard extends StatelessWidget {
             Icon(Icons.show_chart, color: Colors.green, size: 40),
             const SizedBox(height: 8),
             const Text(
-              'Income',
+              'Renda',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
-              '\$${incomeExpense['income']!.toStringAsFixed(2)}',
+              'R\$${incomeExpense['income']!.toStringAsFixed(2)}',
               style: const TextStyle(fontSize: 16, color: Colors.black87),
             ),
           ],

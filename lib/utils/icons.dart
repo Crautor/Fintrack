@@ -33,6 +33,11 @@ const List<CategoryIcon> categoryIcons = [
 CategoryIcon? getCategoryIconById(int id) {
   return categoryIcons.firstWhere(
     (element) => element.id == id,
-    orElse: () => CategoryIcon(id: 0, icon: Icons.help_outline, label: "Desconhecido"),
+    orElse:
+        () => CategoryIcon(
+          id: 0,
+          icon: Icons.help_outline,
+          label: "Desconhecido",
+        ),
   );
 }

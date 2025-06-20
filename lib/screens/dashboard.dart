@@ -1,7 +1,6 @@
 import 'package:fintrack/components/buttons/toggle_button.dart';
 import 'package:fintrack/components/cards/dashboard/expense_card.dart';
 import 'package:fintrack/components/cards/dashboard/income_card.dart';
-import 'package:fintrack/components/cards/dashboard/target_progress_card.dart';
 import 'package:fintrack/components/charts/income_expense_bar_chart.dart';
 import 'package:fintrack/components/headers/default_header.dart';
 import 'package:fintrack/components/overviews/general_overview.dart';
@@ -10,6 +9,7 @@ import 'package:fintrack/models/Transaction/transaction.dart';
 import 'package:fintrack/models/transaction_item_data.dart';
 import 'package:fintrack/services/CategoryService/category_service.dart';
 import 'package:fintrack/services/TransactionService/transaction_service.dart';
+import 'package:fintrack/utils/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -19,11 +19,13 @@ class DashboardPage extends StatefulWidget {
 
   const DashboardPage({super.key, this.onCalendarPressed});
 
+  static final GlobalKey<_DashboardPageState> globalKey = GlobalKey();
+
   @override
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _DashboardPageState extends State<DashboardPage> with RouteAware {
   int selectedToggleIndex = 2;
 
   List<TransactionItem> dailyTransactions = [];
@@ -154,17 +156,13 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  final List<Map<String, dynamic>> selectedTargets = [
-    {'percentage': 0.75, 'title': 'Emergency Fund'},
-    {'percentage': 0.45, 'title': 'Vacation'},
-    {'percentage': 0.60, 'title': 'New Car'},
-    {'percentage': 0.30, 'title': 'Home Renovation'},
-    {'percentage': 0.50, 'title': 'Education Fund'},
-  ];
-
   @override
   void initState() {
     super.initState();
+    _loadTransactions();
+  }
+
+  void refreshData() {
     _loadTransactions();
   }
 
@@ -183,19 +181,14 @@ class _DashboardPageState extends State<DashboardPage> {
           return Center(child: Text('Erro ao carregar categorias'));
         }
 
-        final categories = snapshot.data ?? [];
-
         final transactionDataList =
             selectedTransactions.map((item) {
-              var category = categories.firstWhere(
-                (cat) => cat.categoryId == item.categoryId,
-                orElse: () => Category(name: 'Unknown', categoryId: 0),
-              );
+              var category = getCategoryIconById(item.categoryId);
               return TransactionItemData.fromApi({
                 'category': {
-                  'categoryId': category.categoryId,
-                  'name': category.name,
-                  'icon': category.icon,
+                  'categoryId': category?.id ?? 0,
+                  'name': category?.label ?? 'Desconhecido',
+                  'icon': category?.icon ?? Icons.help_outline,
                 },
                 'description': item.description,
                 'transactionDate': item.transactionDate,
@@ -220,15 +213,10 @@ class _DashboardPageState extends State<DashboardPage> {
             child: Column(
               children: [
                 const DefaultHeader(
-                  title: 'Analysis',
-                  subtitle: 'Your financial overview',
+                  title: 'Análise Financeira',
+                  subtitle: 'Veja como está sua saúde financeira',
                   isBackButtonVisible: false,
-                  child: GeneralOverview(
-                    balance: 7783.00,
-                    expense: 1187.40,
-                    goal: 20000.00,
-                    percentage: 0.3,
-                  ),
+                  child: GeneralOverview(),
                 ),
                 Expanded(
                   child: Padding(
@@ -244,10 +232,10 @@ class _DashboardPageState extends State<DashboardPage> {
                               (index) => index == selectedToggleIndex,
                             ),
                             toggleLabels: const [
-                              "Daily",
-                              "Weekly",
-                              "Monthly",
-                              "Yearly",
+                              "Diária",
+                              "Semanal",
+                              "Mensal",
+                              "Anual",
                             ],
                             onToggle: (index) {
                               setState(() {
@@ -280,32 +268,6 @@ class _DashboardPageState extends State<DashboardPage> {
                             ],
                           ),
                           const SizedBox(height: 20),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'My Targets',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Wrap(
-                            spacing: 20,
-                            runSpacing: 20,
-                            alignment:
-                                selectedTargets.length == 1
-                                    ? WrapAlignment.center
-                                    : WrapAlignment.start,
-                            children:
-                                selectedTargets.map((target) {
-                                  return TargetProgressCard(
-                                    percentage: target['percentage'],
-                                    title: target['title'],
-                                  );
-                                }).toList(),
-                          ),
                         ],
                       ),
                     ),

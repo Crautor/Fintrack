@@ -34,8 +34,8 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   void initState() {
     super.initState();
-    _loadTransactions();
     _loadCategories();
+    _loadTransactions();
   }
 
   Future<void> _loadCategories() async {
@@ -88,14 +88,25 @@ class _CalendarPageState extends State<CalendarPage> {
                     ? DateFormat('HH:mm').format(parsedDate)
                     : '';
 
+            final categoryItem = allCategories.firstWhere(
+              (cat) => cat.categoryId == tx.categoryId,
+              orElse:
+                  () => Category(
+                    categoryId: tx.categoryId,
+                    name: 'Categoria Desconhecida',
+                    icon: '0',
+                  ),
+            );
+
+            final categoryIcon = getCategoryIconById(tx.categoryId)?.icon;
+
             return TransactionItem(
               title: tx.description ?? 'Sem descrição',
               time: timeStr,
               date: dateStr,
-              category:
-                  getCategoryIconById(tx.categoryId)?.label ?? 'Desconhecido',
+              category: categoryItem.name,
               amount: tx.value,
-              icon: getCategoryIconById(tx.categoryId)?.icon ?? Icons.help,
+              icon: categoryIcon ?? Icons.help_outline,
               isIncome: tx.type.toLowerCase() == 'income',
             );
           }).toList();
@@ -106,10 +117,11 @@ class _CalendarPageState extends State<CalendarPage> {
       });
     } catch (e) {
       Fluttertoast.showToast(
-        msg: 'Erro ao carregar transações',
+        msg: 'Erro ao carregar transações: $e',
         backgroundColor: Colors.red,
         textColor: Colors.white,
       );
+      print('[ERROR] Falha ao carregar transações: $e');
     }
   }
 
@@ -153,7 +165,7 @@ class _CalendarPageState extends State<CalendarPage> {
       body: Column(
         children: [
           DefaultHeader(
-            title: "Calendar",
+            title: "Calendário",
             isBackButtonVisible: true,
             onBack: widget.onBack,
           ),
@@ -179,7 +191,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     children: [
                       Expanded(
                         child: ToggleButton(
-                          text: "Transactions",
+                          text: "Transações",
                           isActive: !showCategories,
                           onPressed:
                               () => setState(() => showCategories = false),
@@ -188,7 +200,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: ToggleButton(
-                          text: "Categories",
+                          text: "Categorias",
                           isActive: showCategories,
                           onPressed:
                               () => setState(() => showCategories = true),

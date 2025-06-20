@@ -15,8 +15,8 @@ extension TransactionItemDataMapper on TransactionItemData {
     return TransactionItem(
       icon: icon,
       title: label,
-      time: time.split(" - ").first.trim(),
-      date: time.split(" - ").last.trim(),
+      time: labelTime?.split(" - ").first.trim() ?? '',
+      date: labelTime?.split(" - ").last.trim() ?? '',
       category: category,
       amount: parsedAmount?.abs() ?? 0.0,
       isIncome: (parsedAmount ?? 0) >= 0,

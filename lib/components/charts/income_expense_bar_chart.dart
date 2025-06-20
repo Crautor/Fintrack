@@ -33,16 +33,16 @@ class IncomeExpenseBarChart extends StatelessWidget {
           int week = ((date.day - 1) ~/ 7) + 1;
           switch (week) {
             case 1:
-              periodKey = '1st';
+              periodKey = '1ª';
               break;
             case 2:
-              periodKey = '2nd';
+              periodKey = '2ª';
               break;
             case 3:
-              periodKey = '3rd';
+              periodKey = '3ª';
               break;
             case 4:
-              periodKey = '4th';
+              periodKey = '4ª';
               break;
             default:
               periodKey = '';
@@ -77,7 +77,7 @@ class IncomeExpenseBarChart extends StatelessWidget {
   }
 
   String _getWeekdayAbbreviation(int weekday) {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     return days[(weekday - 1) % 7];
   }
 
@@ -85,9 +85,9 @@ class IncomeExpenseBarChart extends StatelessWidget {
     final now = DateTime.now();
     switch (viewType) {
       case 'daily':
-        return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        return ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
       case 'weekly':
-        return ['1st', '2nd', '3rd', '4th'];
+        return ['1ª', '2ª', '3ª', '4ª'];
       case 'monthly':
         List<String> months = [];
         for (int i = 5; i >= 0; i--) {
@@ -140,17 +140,17 @@ class IncomeExpenseBarChart extends StatelessWidget {
   String _getMonthAbbreviation(int month) {
     const months = [
       'Jan',
-      'Feb',
+      'Fev',
       'Mar',
-      'Apr',
-      'May',
+      'Abr',
+      'Mai',
       'Jun',
       'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
+      'Ago',
+      'Set',
+      'Out',
       'Nov',
-      'Dec',
+      'Dez',
     ];
     return months[month - 1];
   }
@@ -193,7 +193,7 @@ class IncomeExpenseBarChart extends StatelessWidget {
           Row(
             children: [
               const Text(
-                'Income & Expenses',
+                'Renda & Despesas',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
@@ -213,7 +213,7 @@ class IncomeExpenseBarChart extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.search, color: Colors.white),
-                  tooltip: 'Search',
+                  tooltip: 'Pesquisar',
                   splashRadius: 20,
                   padding: EdgeInsets.zero,
                 ),
@@ -229,7 +229,7 @@ class IncomeExpenseBarChart extends StatelessWidget {
                 child: IconButton(
                   onPressed: onCalendarPressed,
                   icon: const Icon(Icons.calendar_month, color: Colors.white),
-                  tooltip: 'Calendar',
+                  tooltip: 'Calendário',
                   splashRadius: 20,
                   padding: EdgeInsets.zero,
                 ),

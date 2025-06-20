@@ -30,12 +30,12 @@ class ExpenseCard extends StatelessWidget {
             Icon(Icons.bar_chart, color: Colors.blue, size: 40),
             const SizedBox(height: 8),
             const Text(
-              'Expense',
+              'Despesas',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
-              '-\$${incomeExpense['expense']!.toStringAsFixed(2)}',
+              '-R\$${incomeExpense['expense']!.toStringAsFixed(2)}',
               style: const TextStyle(fontSize: 16, color: Colors.black87),
             ),
           ],

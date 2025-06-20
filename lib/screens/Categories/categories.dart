@@ -141,12 +141,7 @@ class _CategoriesPageState extends State<CategoriesPage>
               title: 'Categorias',
               subtitle: 'Gerencie suas despesas e metas.',
               isBackButtonVisible: false,
-              child: GeneralOverview(
-                balance: 7783.00,
-                expense: 1187.40,
-                goal: 20000.00,
-                percentage: 0.3,
-              ),
+              child: GeneralOverview(),
             ),
             const TabBar(
               labelColor: Color(0xFF00D09E),

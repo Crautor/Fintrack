@@ -42,16 +42,12 @@ class LastWeekOverview extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Icon(
-                      Icons.directions_car,
-                      size: 30,
-                      color: Colors.black,
-                    ),
+                    const Icon(Icons.flag, size: 30, color: Colors.black),
                   ],
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  "Savings\nOn Goals",
+                  "Economia\nEm Metas",
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.black),
                 ),
@@ -71,7 +67,7 @@ class LastWeekOverview extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Icon(
                         Icons.attach_money,
@@ -83,7 +79,7 @@ class LastWeekOverview extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            "Revenue Last Week",
+                            "Renda na\nSemana Passada",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
@@ -113,7 +109,7 @@ class LastWeekOverview extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Icon(
-                        Icons.fastfood_sharp,
+                        Icons.trending_down,
                         size: 40,
                         color: Colors.black,
                       ),
@@ -122,7 +118,7 @@ class LastWeekOverview extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            "Food Last Week",
+                            "Despesas na\nSemana Passada",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
