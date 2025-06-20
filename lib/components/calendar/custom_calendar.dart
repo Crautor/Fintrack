@@ -27,7 +27,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
   }
 
   List<Widget> _buildDayLabels() {
-    final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    final days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     return days
         .map(
           (day) => Center(
@@ -96,7 +96,9 @@ class _CustomCalendarState extends State<CustomCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    final month = DateFormat.MMMM().format(_currentMonth);
+    String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
+
+    final month = capitalize(DateFormat.MMMM('pt_BR').format(_currentMonth));
     final year = _currentMonth.year.toString();
 
     return Column(

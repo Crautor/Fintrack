@@ -9,6 +9,7 @@ import 'package:fintrack/models/Transaction/transaction.dart';
 import 'package:fintrack/models/transaction_item_data.dart';
 import 'package:fintrack/services/CategoryService/category_service.dart';
 import 'package:fintrack/services/TransactionService/transaction_service.dart';
+import 'package:fintrack/utils/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -54,7 +55,10 @@ class _SearchPageState extends State<SearchPage> {
         );
         return;
       }
-      final categories = await CategoryService.getCategories(storedEmail);
+      var categories = await CategoryService.getCategories(storedEmail);
+      if (categories.isEmpty) {
+        categories = getAllDefaultCategories();
+      }
       setState(() {
         allCategories = categories;
       });
@@ -84,6 +88,7 @@ class _SearchPageState extends State<SearchPage> {
         allTransactions = transactions;
         filteredTransactions =
             allTransactions.map(_mapTransactionToData).toList();
+        filterCategories();
       });
     } catch (e) {
       Fluttertoast.showToast(
@@ -95,16 +100,13 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   TransactionItemData _mapTransactionToData(TransactionItem tx) {
-    final category = allCategories.firstWhere(
-      (cat) => cat.categoryId == tx.categoryId,
-      orElse: () => Category(name: 'Unknown', categoryId: 0),
-    );
+    final category = getCategoryIconById(tx.categoryId);
 
     return TransactionItemData.fromApi({
       'category': {
-        'categotyId': category.categoryId,
-        'name': category.name,
-        'icon': category.icon,
+        'categotyId': category?.id ?? 0,
+        'name': category?.label ?? 'Desconhecido',
+        'icon': category?.icon ?? Icons.help_outline,
       },
       'description': tx.description,
       'transactionDate': tx.transactionDate,
@@ -149,8 +151,8 @@ class _SearchPageState extends State<SearchPage> {
                   final isIncome = tx.type.toString().toLowerCase().contains(
                     'income',
                   );
-                  if (reportType == 'Income' && !isIncome) return false;
-                  if (reportType == 'Expense' && isIncome) return false;
+                  if (reportType == 'Renda' && !isIncome) return false;
+                  if (reportType == 'Despesa' && isIncome) return false;
                 }
 
                 return true;
@@ -160,6 +162,13 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
+  void filterCategories() {
+    allCategories =
+        allCategories.where((cat) {
+          return allTransactions.any((tx) => tx.categoryId == cat.categoryId);
+        }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,11 +176,11 @@ class _SearchPageState extends State<SearchPage> {
       body: Column(
         children: [
           DefaultHeader(
-            title: "Search",
+            title: "Pesquisar",
             isBackButtonVisible: true,
             child: CustomTextField(
               controller: searchController,
-              hintText: 'Search for a transaction label...',
+              hintText: 'Pesquise pelo nome da transação...',
               onChanged: (value) {
                 searchText = value;
               },
@@ -190,7 +199,7 @@ class _SearchPageState extends State<SearchPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Categories',
+                        'Categoria',
                         style: TextStyle(
                           color: Color(0xFF093030),
                           fontSize: 16,
@@ -199,7 +208,7 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                       const SizedBox(height: 8),
                       CustomSelectField<String>(
-                        hintText: 'Select a category',
+                        hintText: 'Selecione uma categoria',
                         items:
                             allCategories
                                 .map(
@@ -218,7 +227,7 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                       const SizedBox(height: 16),
                       const Text(
-                        'Date',
+                        'Data',
                         style: TextStyle(
                           color: Color(0xFF093030),
                           fontSize: 16,
@@ -227,7 +236,7 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                       const SizedBox(height: 8),
                       DatePickerField(
-                        hintText: 'Select a date',
+                        hintText: 'Selecione uma data',
                         initialDate: selectedDate,
                         onDateSelected: (date) {
                           setState(() {
@@ -237,9 +246,9 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                       const SizedBox(height: 16),
                       CustomRadioGroup(
-                        label: 'Report',
+                        label: 'Tipo de Transação',
                         selectedValue: reportType,
-                        options: const ['Income', 'Expense'],
+                        options: const ['Renda', 'Despesa'],
                         onChanged: (value) {
                           setState(() {
                             reportType = value;
@@ -248,7 +257,7 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                       const SizedBox(height: 20),
                       PrimaryButton(
-                        text: 'Search',
+                        text: 'Pesquisar',
                         onPressed: filterTransactions,
                       ),
                       const SizedBox(height: 20),
@@ -277,7 +286,7 @@ class _SearchPageState extends State<SearchPage> {
                           child: Padding(
                             padding: EdgeInsets.only(top: 20),
                             child: Text(
-                              'No transactions found',
+                              'Nenhum resultado encontrado',
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),

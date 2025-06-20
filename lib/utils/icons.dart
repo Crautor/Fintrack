@@ -1,3 +1,4 @@
+import 'package:fintrack/models/Category/category.dart';
 import 'package:flutter/material.dart';
 
 class CategoryIcon {
@@ -33,6 +34,17 @@ const List<CategoryIcon> categoryIcons = [
 CategoryIcon? getCategoryIconById(int id) {
   return categoryIcons.firstWhere(
     (element) => element.id == id,
-    orElse: () => CategoryIcon(id: 0, icon: Icons.help_outline, label: "Desconhecido"),
+    orElse:
+        () => CategoryIcon(
+          id: 0,
+          icon: Icons.help_outline,
+          label: "Desconhecido",
+        ),
   );
+}
+
+List<Category> getAllDefaultCategories() {
+  return categoryIcons.map((icon) {
+    return Category(categoryId: icon.id, name: icon.label);
+  }).toList();
 }

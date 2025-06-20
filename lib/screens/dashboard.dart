@@ -1,7 +1,6 @@
 import 'package:fintrack/components/buttons/toggle_button.dart';
 import 'package:fintrack/components/cards/dashboard/expense_card.dart';
 import 'package:fintrack/components/cards/dashboard/income_card.dart';
-import 'package:fintrack/components/cards/dashboard/target_progress_card.dart';
 import 'package:fintrack/components/charts/income_expense_bar_chart.dart';
 import 'package:fintrack/components/headers/default_header.dart';
 import 'package:fintrack/components/overviews/general_overview.dart';
@@ -154,14 +153,6 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  final List<Map<String, dynamic>> selectedTargets = [
-    {'percentage': 0.75, 'title': 'Emergency Fund'},
-    {'percentage': 0.45, 'title': 'Vacation'},
-    {'percentage': 0.60, 'title': 'New Car'},
-    {'percentage': 0.30, 'title': 'Home Renovation'},
-    {'percentage': 0.50, 'title': 'Education Fund'},
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -220,8 +211,8 @@ class _DashboardPageState extends State<DashboardPage> {
             child: Column(
               children: [
                 const DefaultHeader(
-                  title: 'Analysis',
-                  subtitle: 'Your financial overview',
+                  title: 'Análise Financeira',
+                  subtitle: 'Veja como está sua saúde financeira',
                   isBackButtonVisible: false,
                   child: GeneralOverview(
                     balance: 7783.00,
@@ -244,10 +235,10 @@ class _DashboardPageState extends State<DashboardPage> {
                               (index) => index == selectedToggleIndex,
                             ),
                             toggleLabels: const [
-                              "Daily",
-                              "Weekly",
-                              "Monthly",
-                              "Yearly",
+                              "Diária",
+                              "Semanal",
+                              "Mensal",
+                              "Anual",
                             ],
                             onToggle: (index) {
                               setState(() {
@@ -280,32 +271,6 @@ class _DashboardPageState extends State<DashboardPage> {
                             ],
                           ),
                           const SizedBox(height: 20),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'My Targets',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Wrap(
-                            spacing: 20,
-                            runSpacing: 20,
-                            alignment:
-                                selectedTargets.length == 1
-                                    ? WrapAlignment.center
-                                    : WrapAlignment.start,
-                            children:
-                                selectedTargets.map((target) {
-                                  return TargetProgressCard(
-                                    percentage: target['percentage'],
-                                    title: target['title'],
-                                  );
-                                }).toList(),
-                          ),
                         ],
                       ),
                     ),

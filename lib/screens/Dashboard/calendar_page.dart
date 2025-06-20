@@ -95,7 +95,9 @@ class _CalendarPageState extends State<CalendarPage> {
               category:
                   getCategoryIconById(tx.categoryId)?.label ?? 'Desconhecido',
               amount: tx.value,
-              icon: getCategoryIconById(tx.categoryId)?.icon ?? Icons.help,
+              icon:
+                  getCategoryIconById(tx.categoryId)?.icon ??
+                  Icons.help_outline,
               isIncome: tx.type.toLowerCase() == 'income',
             );
           }).toList();
@@ -153,7 +155,7 @@ class _CalendarPageState extends State<CalendarPage> {
       body: Column(
         children: [
           DefaultHeader(
-            title: "Calendar",
+            title: "Calendário",
             isBackButtonVisible: true,
             onBack: widget.onBack,
           ),
@@ -179,7 +181,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     children: [
                       Expanded(
                         child: ToggleButton(
-                          text: "Transactions",
+                          text: "Transações",
                           isActive: !showCategories,
                           onPressed:
                               () => setState(() => showCategories = false),
@@ -188,7 +190,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: ToggleButton(
-                          text: "Categories",
+                          text: "Categorias",
                           isActive: showCategories,
                           onPressed:
                               () => setState(() => showCategories = true),

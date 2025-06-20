@@ -29,7 +29,7 @@ class GeneralOverview extends StatelessWidget {
                       Icon(Icons.trending_up, size: 16, color: Colors.black),
                       SizedBox(width: 4),
                       Text(
-                        "Total Balance",
+                        "Saldo Atual",
                         style: TextStyle(color: Colors.black54, fontSize: 12),
                       ),
                     ],
@@ -61,7 +61,7 @@ class GeneralOverview extends StatelessWidget {
                       Icon(Icons.trending_down, size: 16, color: Colors.black),
                       SizedBox(width: 4),
                       Text(
-                        "Total Expense",
+                        "Gastos Totais",
                         style: TextStyle(color: Colors.black54, fontSize: 12),
                       ),
                     ],

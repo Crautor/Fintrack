@@ -92,16 +92,17 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _loadAndPrintAuthInfo();
   }
-  
-Future<void> _loadAndPrintAuthInfo() async {
-  print('[DEBUG] Iniciando leitura dos tokens...');
-  final storage = FlutterSecureStorage();
-  final token = await storage.read(key: 'auth_token');
-  final storedEmail = await storage.read(key: 'user-mail');
 
-  print('[DEBUG] auth_token: $token');
-  print('[DEBUG] user-mail: $storedEmail');
-}
+  Future<void> _loadAndPrintAuthInfo() async {
+    print('[DEBUG] Iniciando leitura dos tokens...');
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'auth_token');
+    final storedEmail = await storage.read(key: 'user-mail');
+
+    print('[DEBUG] auth_token: $token');
+    print('[DEBUG] user-mail: $storedEmail');
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -120,8 +121,8 @@ Future<void> _loadAndPrintAuthInfo() async {
         child: Column(
           children: [
             const DefaultHeader(
-              title: 'Hello, Welcome Back',
-              subtitle: 'Good Morning',
+              title: 'Olá, Bem-vindo ao FinTrack!',
+              subtitle: 'Gerencie suas finanças',
               isBackButtonVisible: false,
               child: GeneralOverview(
                 balance: 7783.00,
@@ -145,7 +146,7 @@ Future<void> _loadAndPrintAuthInfo() async {
                       ),
                       const SizedBox(height: 20),
                       TransactionSection(
-                        toggleLabels: ["Daily", "Weekly", "Monthly"],
+                        toggleLabels: ["Diária", "Semanal", "Mensal"],
                         isSelected: List.generate(
                           3,
                           (index) => index == selectedToggleIndex,
