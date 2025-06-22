@@ -159,6 +159,7 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
   }
 
   void refreshData() {
+    refreshData();
     _loadTransactions();
   }
 

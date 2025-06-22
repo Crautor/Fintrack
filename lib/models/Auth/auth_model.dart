@@ -11,14 +11,16 @@ class LoginRequest {
 
 class LoginResponse {
   final String? message;
-  final String? token;
+  final String? accessToken;
+  final String? refreshToken;
 
-  LoginResponse({this.message, this.token});
+  LoginResponse({this.message, this.accessToken, this.refreshToken});
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
       message: json['message'] ?? json['mensagem'] ?? json['erro'],
-      token: json['token'],
+      accessToken: json['accessToken'] ?? json['token'],
+      refreshToken: json['refreshToken'],
     );
   }
 }
