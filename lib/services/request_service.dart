@@ -69,9 +69,18 @@ class RequestService {
         statusCode: response.statusCode,
       );
     } else {
-      throw Exception(
-        '[POST] Request failed → ${response.statusCode}: ${response.body}',
-      );
+      String errorMessage = 'Erro desconhecido';
+      try {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic> && decoded.containsKey('erro')) {
+          errorMessage = decoded['erro'];
+        } else if (decoded is Map<String, dynamic> &&
+            decoded.containsKey('message')) {
+          errorMessage = decoded['message'];
+        }
+      } catch (_) {}
+
+      throw Exception(errorMessage);
     }
   }
 

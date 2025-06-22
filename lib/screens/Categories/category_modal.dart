@@ -69,12 +69,8 @@ class _CategoryModalState extends State<CategoryModal> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  print('[DEBUG] Nome digitado: ${_nameController.text}');
-                  print('[DEBUG] Ícone selecionado: ${_selectedIcon?.id}');
-
                   if (_nameController.text.isNotEmpty &&
                       _selectedIcon != null) {
-                    print('[DEBUG] Chamando onSave com nome e ícone válidos');
                     widget.onSave(_nameController.text, _selectedIcon!);
                     Navigator.pop(context);
                   } else {

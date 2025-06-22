@@ -70,7 +70,6 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
     try {
       final storedEmail = await storage.read(key: 'user-mail');
       if (storedEmail == null) {
-        print('[ERROR] Email do usuário não encontrado no storage');
         return;
       }
 
@@ -113,7 +112,6 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
 
       setState(() {});
     } catch (e) {
-      print('[ERROR] Falha ao carregar transações: $e');
       Fluttertoast.showToast(
         msg: 'Erro ao carregar transações',
         backgroundColor: Colors.red,
@@ -141,12 +139,10 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
     try {
       final storedEmail = await storage.read(key: 'user-mail');
       if (storedEmail == null) {
-        print('[ERROR] Email do usuário não encontrado no storage');
         return [];
       }
       return await CategoryService.getCategories(storedEmail);
     } catch (e) {
-      print('[ERROR] Falha ao carregar categorias: $e');
       Fluttertoast.showToast(
         msg: 'Erro ao carregar categorias',
         backgroundColor: Colors.red,

@@ -4,12 +4,10 @@ import 'package:fintrack/components/overviews/last_week_overview.dart';
 import 'package:fintrack/components/tables/transaction_section.dart';
 import 'package:fintrack/models/Category/category.dart';
 import 'package:fintrack/models/Transaction/transaction.dart';
-import 'package:fintrack/models/transaction_item_data.dart';
 import 'package:fintrack/services/CategoryService/category_service.dart';
 import 'package:fintrack/services/TransactionService/transaction_service.dart';
 import 'package:fintrack/services/SavingService/saving_service.dart';
 import 'package:fintrack/services/FinancialGoalService/financial_goal_service.dart';
-import 'package:fintrack/utils/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -45,22 +43,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _loadAndPrintAuthInfo();
     _loadCategories();
     _loadTransactions();
   }
 
   void refreshData() {
     _loadTransactions();
-  }
-
-  Future<void> _loadAndPrintAuthInfo() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'auth_token');
-    final storedEmail = await storage.read(key: 'user-mail');
-
-    print('[DEBUG] auth_token: $token');
-    print('[DEBUG] user-mail: $storedEmail');
   }
 
   Future<void> _loadCategories() async {
@@ -153,7 +141,7 @@ class _HomePageState extends State<HomePage> {
     setState(() => isLoading = false);
   }
 
-  List<TransactionItemData> getSelectedTransactions() {
+  List<TransactionItem> getSelectedTransactions() {
     totalIncome = 0;
     totalExpense = 0;
 
@@ -170,37 +158,15 @@ class _HomePageState extends State<HomePage> {
         selected = monthlyTransactions;
     }
 
-    return selected.map((tx) {
-      if (tx.type == 'Income') {
+    for (var tx in selected) {
+      if (tx.type.toLowerCase() == 'income') {
         totalIncome += tx.value;
       } else {
         totalExpense += tx.value;
       }
+    }
 
-      final category = allCategories.firstWhere(
-        (cat) => cat.categoryId == tx.categoryId,
-        orElse:
-            () => Category(
-              categoryId: tx.categoryId,
-              name: 'Categoria Desconhecida',
-              icon: '0',
-            ),
-      );
-
-      final categoryIcon = getCategoryIconById(tx.categoryId)?.icon;
-
-      return TransactionItemData.fromApi({
-        'category': {
-          'categotyId': category.categoryId ?? 0,
-          'name': category.name,
-          'icon': categoryIcon ?? Icons.help_outline,
-        },
-        'description': tx.description,
-        'transactionDate': tx.transactionDate,
-        'type': tx.type,
-        'value': tx.value,
-      });
-    }).toList();
+    return selected;
   }
 
   @override

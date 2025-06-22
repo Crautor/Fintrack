@@ -62,8 +62,7 @@ class _FinancialGoalDetailPageState extends State<FinancialGoalDetailPage> {
       if (mounted) {
         setState(() => goal = fetchedGoal);
       }
-    } catch (e, stack) {
-      print('[ERROR loadGoal] $e\n$stack');
+    } catch (e) {
       Fluttertoast.showToast(
         msg: 'Erro ao carregar dados da meta',
         backgroundColor: Colors.red,
@@ -91,7 +90,6 @@ class _FinancialGoalDetailPageState extends State<FinancialGoalDetailPage> {
         });
       }
     } catch (e) {
-      print('[ERROR loadSavings] $e');
       Fluttertoast.showToast(
         msg: 'Erro ao carregar depósitos',
         backgroundColor: Colors.red,

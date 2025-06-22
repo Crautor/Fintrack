@@ -1,9 +1,8 @@
 import 'package:fintrack/components/graph/pizza.dart';
 import 'package:fintrack/models/Category/category.dart';
-import 'package:fintrack/models/Transaction/list_transaction.dart';
+import 'package:fintrack/models/Transaction/transaction.dart';
 import 'package:fintrack/services/CategoryService/category_service.dart';
 import 'package:fintrack/services/TransactionService/transaction_service.dart';
-import 'package:fintrack/utils/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:fintrack/components/headers/default_header.dart';
 import 'package:fintrack/components/calendar/custom_calendar.dart';
@@ -11,7 +10,6 @@ import 'package:fintrack/components/buttons/toggle_button_calendar.dart';
 import 'package:fintrack/components/cards/transactions/transaction_card.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:intl/intl.dart';
 
 class CalendarPage extends StatefulWidget {
   final VoidCallback onBack;
@@ -76,43 +74,8 @@ class _CalendarPageState extends State<CalendarPage> {
 
       final transactions = await TransactionService.getAll(storedEmail);
 
-      List<TransactionItem> converted =
-          transactions.map((tx) {
-            final parsedDate = DateTime.tryParse(tx.transactionDate);
-            final dateStr =
-                parsedDate != null
-                    ? DateFormat('dd/MM/yyyy').format(parsedDate)
-                    : '';
-            final timeStr =
-                parsedDate != null
-                    ? DateFormat('HH:mm').format(parsedDate)
-                    : '';
-
-            final categoryItem = allCategories.firstWhere(
-              (cat) => cat.categoryId == tx.categoryId,
-              orElse:
-                  () => Category(
-                    categoryId: tx.categoryId,
-                    name: 'Categoria Desconhecida',
-                    icon: '0',
-                  ),
-            );
-
-            final categoryIcon = getCategoryIconById(tx.categoryId)?.icon;
-
-            return TransactionItem(
-              title: tx.description ?? 'Sem descrição',
-              time: timeStr,
-              date: dateStr,
-              category: categoryItem.name,
-              amount: tx.value,
-              icon: categoryIcon ?? Icons.help_outline,
-              isIncome: tx.type.toLowerCase() == 'income',
-            );
-          }).toList();
-
       setState(() {
-        allTransactions = converted;
+        allTransactions = transactions;
         _filterTransactionsForSelected();
       });
     } catch (e) {
@@ -121,16 +84,13 @@ class _CalendarPageState extends State<CalendarPage> {
         backgroundColor: Colors.red,
         textColor: Colors.white,
       );
-      print('[ERROR] Falha ao carregar transações: $e');
     }
   }
 
   void _filterTransactionsForSelected() {
     transactionsForSelected =
         allTransactions.where((transaction) {
-          final txDate = DateTime.tryParse(
-            transaction.date.split('/').reversed.join('-'),
-          );
+          final txDate = DateTime.tryParse(transaction.transactionDate);
           return txDate?.day == selectedDate.day &&
               txDate?.month == selectedDate.month &&
               txDate?.year == selectedDate.year;
@@ -143,8 +103,21 @@ class _CalendarPageState extends State<CalendarPage> {
     final categoryTotals = <String, double>{};
 
     for (final tx in transactionsForSelected) {
-      categoryTotals[tx.category] =
-          (categoryTotals[tx.category] ?? 0) + tx.amount;
+      final categoryName =
+          allCategories
+              .firstWhere(
+                (cat) => cat.categoryId == tx.categoryId,
+                orElse:
+                    () => Category(
+                      categoryId: tx.categoryId,
+                      name: 'Categoria ${tx.categoryId}',
+                      icon: '0',
+                    ),
+              )
+              .name;
+
+      categoryTotals[categoryName] =
+          (categoryTotals[categoryName] ?? 0) + tx.value;
     }
 
     final totalAmount = categoryTotals.values.fold(

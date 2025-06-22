@@ -1,111 +1,107 @@
 import 'package:fintrack/components/cards/transactions/transaction_card.dart';
 import 'package:fintrack/components/headers/transactions_header.dart';
-import 'package:fintrack/models/Transaction/list_transaction.dart';
+import 'package:fintrack/models/Transaction/transaction.dart';
+import 'package:fintrack/services/TransactionService/transaction_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
+
+  static final GlobalKey<_TransactionsScreenState> globalKey = GlobalKey();
 
   @override
   State<TransactionsScreen> createState() => _TransactionsScreenState();
 }
 
 class _TransactionsScreenState extends State<TransactionsScreen> {
+  final storage = const FlutterSecureStorage();
+
+  void refreshData() {
+    fetchTransactions();
+  }
+
   String? selectedFilter;
   DateTime? selectedDate;
 
-  final Map<String, List<TransactionItem>> groupedTransactions = {
-    'April': [
-      TransactionItem(
-        title: 'Salário',
-        time: '18:27',
-        date: 'April 30',
-        category: 'Monthly',
-        amount: 4000.00,
-        icon: Icons.attach_money,
-        isIncome: true,
-      ),
-      TransactionItem(
-        title: 'Groceries',
-        time: '17:00',
-        date: 'April 24',
-        category: 'Pantry',
-        amount: 100.00,
-        icon: Icons.shopping_cart,
-      ),
-      TransactionItem(
-        title: 'Rent',
-        time: '08:30',
-        date: 'April 15',
-        category: 'Rent',
-        amount: 674.40,
-        icon: Icons.home,
-      ),
-      TransactionItem(
-        title: 'Transport',
-        time: '07:30',
-        date: 'April 08',
-        category: 'Fuel',
-        amount: 4.13,
-        icon: Icons.directions_bus,
-      ),
-    ],
-    'March': [
-      TransactionItem(
-        title: 'Food',
-        time: '19:30',
-        date: 'March 31',
-        category: 'Dinner',
-        amount: 70.40,
-        icon: Icons.restaurant,
-      ),
-    ],
-  };
+  List<TransactionItem> allTransactions = [];
+  double totalBalance = 0;
+  double totalIncome = 0;
+  double totalExpenses = 0;
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime now = DateTime.now();
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate ?? now,
-      firstDate: DateTime(now.year - 5),
-      lastDate: DateTime(now.year + 5),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF00D09E),
-              onPrimary: Colors.white,
-              onSurface: Color(0xFF093030),
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: Color(0xFF00D09E)),
-            ),
-          ),
-          child: child!,
-        );
-      },
+  @override
+  void initState() {
+    super.initState();
+    fetchTransactions();
+  }
+
+  Future<void> fetchTransactions() async {
+    final email = await storage.read(key: 'user-mail');
+    if (email == null) return;
+
+    final transactions = await TransactionService.getAll(email);
+    double income = 0;
+    double expenses = 0;
+
+    for (var item in transactions) {
+      if (item.type.toLowerCase() == 'income') {
+        income += item.value;
+      } else {
+        expenses += item.value;
+      }
+    }
+
+    transactions.sort(
+      (a, b) => DateTime.parse(
+        b.transactionDate,
+      ).compareTo(DateTime.parse(a.transactionDate)),
     );
 
-    if (picked != null) {
-      setState(() {
-        selectedDate = picked;
-        print('Data selecionada: ${DateFormat('dd/MM/yyyy').format(picked)}');
-      });
+    setState(() {
+      allTransactions = transactions;
+      totalIncome = income;
+      totalExpenses = expenses;
+      totalBalance = income - expenses;
+    });
+  }
+
+  Map<String, List<TransactionItem>> groupTransactionsByMonth(
+    List<TransactionItem> transactions,
+  ) {
+    final Map<String, List<TransactionItem>> grouped = {};
+
+    for (var item in transactions) {
+      final date = DateTime.parse(item.transactionDate);
+      final key = DateFormat('MMMM yyyy', 'pt_BR').format(date);
+
+      grouped.putIfAbsent(key, () => []);
+      grouped[key]!.add(item);
     }
+
+    return Map.fromEntries(
+      grouped.entries.toList()..sort(
+        (a, b) => DateFormat(
+          'MMMM yyyy',
+          'pt_BR',
+        ).parse(b.key).compareTo(DateFormat('MMMM yyyy', 'pt_BR').parse(a.key)),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final grouped = groupTransactionsByMonth(allTransactions);
+
     return Scaffold(
       extendBody: true,
       backgroundColor: const Color(0xFF00D09E),
       body: Column(
         children: [
           TransactionsHeader(
-            totalBalance: 7783.00,
-            income: 4120.00,
-            expenses: 1187.40,
+            totalBalance: totalBalance,
+            income: totalIncome,
+            expenses: totalExpenses,
             selectedFilter: selectedFilter,
             onFilterChanged: (filter) {
               setState(() {
@@ -123,29 +119,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   topRight: Radius.circular(50),
                 ),
               ),
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
               child: Column(
                 children: [
                   Row(
                     children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFDFF7E2),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(
-                            Icons.calendar_month,
-                            size: 18,
-                            color: Color(0xFF093030),
-                          ),
-                          onPressed: () => _selectDate(context),
-                          splashRadius: 18,
-                        ),
-                      ),
                       const SizedBox(width: 12),
                       if (selectedDate != null)
                         Text(
@@ -160,35 +138,50 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   ),
                   const SizedBox(height: 16),
                   Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.only(top: 0),
-                      children:
-                          groupedTransactions.entries.map((entry) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  entry.key,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0E3E3E),
-                                  ),
+                    child:
+                        allTransactions.isEmpty
+                            ? const Center(
+                              child: Text(
+                                'Nenhuma transação encontrada.',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF0E3E3E),
                                 ),
-                                const SizedBox(height: 12),
-                                ...entry.value.map(
-                                  (item) => Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 10,
-                                    ),
-                                    child: TransactionCard(item: item),
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-                              ],
-                            );
-                          }).toList(),
-                    ),
+                              ),
+                            )
+                            : ListView(
+                              children:
+                                  grouped.entries.map((entry) {
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 8,
+                                            top: 16,
+                                          ),
+                                          child: Text(
+                                            entry.key,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF0E3E3E),
+                                            ),
+                                          ),
+                                        ),
+                                        ...entry.value.map((item) {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 10,
+                                            ),
+                                            child: TransactionCard(item: item),
+                                          );
+                                        }),
+                                      ],
+                                    );
+                                  }).toList(),
+                            ),
                   ),
                 ],
               ),
