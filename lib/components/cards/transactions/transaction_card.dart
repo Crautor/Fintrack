@@ -1,5 +1,6 @@
-import 'package:fintrack/models/Transaction/list_transaction.dart';
+import 'package:fintrack/models/Transaction/transaction.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class TransactionCard extends StatelessWidget {
   final TransactionItem item;
@@ -8,15 +9,23 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final date = DateTime.parse(item.transactionDate);
+    final formattedDate = DateFormat('dd MMM').format(date);
+    final formattedTime = DateFormat('HH:mm').format(date);
+    final isIncome = item.type.toLowerCase() == 'income';
+
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: const BoxDecoration(
-            color: Color(0xFFB8EFFF),
+          decoration: BoxDecoration(
+            color: isIncome ? const Color(0xFFD4F8E8) : const Color(0xFFE8F4FF),
             shape: BoxShape.circle,
           ),
-          child: Icon(item.icon, color: Colors.blue[800]),
+          child: Icon(
+            isIncome ? Icons.arrow_downward : Icons.arrow_upward,
+            color: isIncome ? Colors.green : Colors.red,
+          ),
         ),
         const SizedBox(width: 12),
 
@@ -26,24 +35,27 @@ class TransactionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                item.title,
+                item.description ?? 'Sem descrição',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                '${item.time} – ${item.date}',
+                '$formattedTime – $formattedDate',
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
-              Text(item.category, style: const TextStyle(fontSize: 12)),
+              Text(
+                'Categoria ${item.categoryId}',
+                style: const TextStyle(fontSize: 12),
+              ),
             ],
           ),
         ),
 
         // Valor
         Text(
-          '${item.isIncome ? '+' : '-'} R\$${item.amount.toStringAsFixed(2)}',
+          '${isIncome ? '+' : '-'} R\$${item.value.toStringAsFixed(2)}',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: item.isIncome ? Colors.green : Colors.blue,
+            color: isIncome ? Colors.green : Colors.red,
           ),
         ),
       ],

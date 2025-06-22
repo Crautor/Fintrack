@@ -66,8 +66,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
       if (mounted && cat != null) {
         setState(() => category = cat);
       }
-    } catch (e, stack) {
-      print('[ERROR loadCategory] $e\n$stack');
+    } catch (e) {
       Fluttertoast.showToast(
         msg: 'Erro ao carregar dados da categoria',
         backgroundColor: Colors.red,
@@ -95,7 +94,6 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
         });
       }
     } catch (e) {
-      print('[ERROR loadTransactions] $e');
       Fluttertoast.showToast(
         msg: 'Erro ao carregar transações',
         backgroundColor: Colors.red,

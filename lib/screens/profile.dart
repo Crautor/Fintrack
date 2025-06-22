@@ -1,7 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fintrack/models/User/User.dart';
+import 'package:fintrack/services/UserService/user_service.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  static final globalKey = GlobalKey<_ProfilePageState>();
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  User? user;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
+  Future<void> loadUser() async {
+    try {
+      final fetchedUser = await UserService.getByEmail();
+      setState(() {
+        user = fetchedUser;
+        isLoading = false;
+      });
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Erro ao carregar usuário");
+      setState(() => isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,17 +109,17 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 10),
 
-                const Text(
-                  'John Smith',
-                  style: TextStyle(
+                Text(
+                  isLoading ? 'Carregando...' : (user?.name ?? 'Usuário'),
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                     color: Colors.black,
                   ),
                 ),
-                const SizedBox(height: 4),
 
                 const SizedBox(height: 30),
 
@@ -115,11 +148,24 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildOptionButton(IconData icon, String label, BuildContext context) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         if (label == "Editar Perfil") {
           Navigator.pushNamed(context, '/edit-profile');
+        } else if (label == "Sair") {
+          const storage = FlutterSecureStorage();
+          await storage.deleteAll();
+
+          Fluttertoast.showToast(
+            msg: "Logout realizado com sucesso",
+            backgroundColor: Colors.green,
+          );
+
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/prelogin',
+            (route) => false,
+          );
         }
-        // lógica pra sair
       },
       child: Container(
         decoration: BoxDecoration(

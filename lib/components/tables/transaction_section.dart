@@ -1,6 +1,5 @@
-import 'package:fintrack/components/tables/transaction_item_data_mapper.dart';
 import 'package:flutter/material.dart';
-import 'package:fintrack/models/transaction_item_data.dart';
+import 'package:fintrack/models/Transaction/transaction.dart';
 import 'package:fintrack/components/cards/transactions/transaction_card.dart';
 import 'package:fintrack/components/buttons/toggle_button.dart';
 
@@ -8,7 +7,7 @@ class TransactionSection extends StatelessWidget {
   final List<String> toggleLabels;
   final List<bool> isSelected;
   final void Function(int index) onToggle;
-  final List<TransactionItemData> transactions;
+  final List<TransactionItem> transactions;
 
   const TransactionSection({
     super.key,
@@ -34,7 +33,7 @@ class TransactionSection extends StatelessWidget {
         ...transactions.map(
           (tx) => Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: TransactionCard(item: tx.toTransactionItem()),
+            child: TransactionCard(item: tx),
           ),
         ),
       ],

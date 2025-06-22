@@ -8,7 +8,6 @@ class Category {
 
   factory Category.fromJson(Map<String, dynamic> json) {
     try {
-      print('[DEBUG Category.fromJson] Recebido: $json');
       return Category(
         categoryId:
             json['categoryId'] is int
@@ -16,18 +15,15 @@ class Category {
                 : int.tryParse(json['categoryId'].toString()),
         name: json['name'] ?? 'Sem nome',
         icon: json['icon']?.toString(),
-        email: json['email'], // pode ser null
+        email: json['email'],
       );
-    } catch (e, stack) {
-      print('[ERROR Category.fromJson] Falhou ao converter: $e');
-      print('[STACK] $stack');
-      print('[JSON] $json');
+    } catch (e) {
       rethrow;
     }
   }
 
   static Category fromItemResponse(Map<String, dynamic> json) {
-    return Category.fromJson(json['item']); // só use se o JSON tiver "item"
+    return Category.fromJson(json['item']);
   }
 
   static List<Category> fromListResponse(Map<String, dynamic> json) {

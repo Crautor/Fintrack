@@ -89,8 +89,9 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e) {
+      final cleanMessage = e.toString().replaceFirst('Exception: ', '');
       Fluttertoast.showToast(
-        msg: 'Erro inesperado: $e',
+        msg: cleanMessage,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: Colors.red,

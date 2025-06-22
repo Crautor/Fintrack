@@ -24,9 +24,9 @@ class MainScreenState extends State<MainScreen> {
     return [
       HomePage(key: HomePage.globalKey),
       DashboardTab(key: DashboardPage.globalKey),
-      const TransactionsScreen(),
+      TransactionsScreen(key: TransactionsScreen.globalKey),
       CategoriesTab(key: ValueKey(_currentIndex == 3 ? DateTime.now() : null)),
-      const ProfilePage(),
+      ProfilePage(key: ProfilePage.globalKey),
     ];
   }
 
@@ -53,6 +53,12 @@ class MainScreenState extends State<MainScreen> {
 
           if (index == 1) {
             DashboardPage.globalKey.currentState?.refreshData();
+          }
+          if (index == 2) {
+            TransactionsScreen.globalKey.currentState?.refreshData();
+          }
+          if (index == 4) {
+            ProfilePage.globalKey.currentState?.loadUser();
           }
         },
       ),
