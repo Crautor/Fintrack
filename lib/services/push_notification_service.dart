@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fintrack/services/request_service.dart';
 
 class PushNotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -14,13 +15,13 @@ class PushNotificationService {
     final token = await _messaging.getToken();
     print('FCM Token: $token');
     if (token != null) {
-      await _registerTokenOnBackend(token);
+      await registerTokenOnBackend(token);
     }
 
     // Listener correto para atualização de token
     _messaging.onTokenRefresh.listen((newToken) async {
       print('Novo FCM Token: $newToken');
-      await _registerTokenOnBackend(newToken);
+      await registerTokenOnBackend(newToken);
     });
 
     // Manipula mensagens recebidas em foreground
@@ -36,7 +37,7 @@ class PushNotificationService {
     });
   }
 
-  static Future<void> _registerTokenOnBackend(String token) async {
+  static Future<void> registerTokenOnBackend(String token) async {
     try {
       // Busca o user-mail do storage seguro
       final storage = const FlutterSecureStorage();
@@ -45,16 +46,18 @@ class PushNotificationService {
         print('⚠️ Usuário não autenticado, não foi possível registrar o token');
         return;
       }
-      final url = Uri.parse('http://localhost:3000/api/notifications/tokens/registrar?email=$userEmail');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'token': token }),
+      // final url = Uri.parse(
+      //   'http://localhost:3000/api/notifications/tokens/registrar?email=$userEmail',
+      // );
+      final response = await RequestService.post<void>(
+        'notifications/tokens/registrar?email=$userEmail',
+        {'token': token},
+        (_) => null,
       );
       if (response.statusCode == 200) {
         print('✅ Token registrado com sucesso no backend!');
       } else {
-        print('⚠️ Erro ao registrar token: \\${response.statusCode} - \\${response.body}');
+        print('⚠️ Falha ao registrar token no backend: ${response}');
       }
     } catch (e) {
       print('❌ Erro ao enviar token: \\${e.toString()}');

@@ -1,3 +1,4 @@
+import 'package:fintrack/services/push_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fintrack/components/texts/form_label.dart';
 import 'package:fintrack/routes/app.routes.dart';
@@ -8,6 +9,7 @@ import '../../../services/request_service.dart';
 import '../../models/Auth/auth_model.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -66,6 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
         if (refreshToken != null) {
           await storage.write(key: 'refresh_token', value: refreshToken);
         }
+
+        await PushNotificationService.initialize();
 
         Fluttertoast.showToast(
           msg: response.data.message ?? "Login realizado com sucesso!",
