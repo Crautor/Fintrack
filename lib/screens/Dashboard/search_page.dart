@@ -107,13 +107,13 @@ class _SearchPageState extends State<SearchPage> {
           ),
     );
 
-    final categoryIcon = getCategoryIconById(tx.categoryId)?.icon;
+    final categoryIcon = getCategoryIconByStringId(category.icon ?? '0');
 
     return TransactionItemData.fromApi({
       'category': {
         'categotyId': category.categoryId ?? 0,
         'name': category.name,
-        'icon': categoryIcon ?? Icons.help_outline,
+        'icon': categoryIcon?.icon ?? Icons.help_outline,
       },
       'description': tx.description,
       'transactionDate': tx.transactionDate,

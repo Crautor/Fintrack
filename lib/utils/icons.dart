@@ -41,3 +41,15 @@ CategoryIcon? getCategoryIconById(int id) {
         ),
   );
 }
+
+CategoryIcon? getCategoryIconByStringId(String id) {
+  return categoryIcons.firstWhere(
+    (element) => element.id.toString() == id,
+    orElse:
+        () => CategoryIcon(
+          id: 0,
+          icon: Icons.help_outline,
+          label: "Desconhecido",
+        ),
+  );
+}
