@@ -76,7 +76,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     final request = NovaSenhaRequest(
       email: email,
       codigo: code.toString(),
-      newPassword: newPassword,
+      novapassword: newPassword,
     );
 
     try {
