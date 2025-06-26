@@ -1,3 +1,4 @@
+import 'package:fintrack/services/push_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fintrack/components/texts/form_label.dart';
 import 'package:fintrack/routes/app.routes.dart';
@@ -66,6 +67,8 @@ class _LoginScreenState extends State<LoginScreen> {
         if (refreshToken != null) {
           await storage.write(key: 'refresh_token', value: refreshToken);
         }
+
+        await PushNotificationService.initialize();
 
         Fluttertoast.showToast(
           msg: response.data.message ?? "Login realizado com sucesso!",

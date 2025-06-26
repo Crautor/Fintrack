@@ -130,25 +130,27 @@ class RequestService {
     Map<String, String> headers,
     dynamic body,
   ) {
+    dynamic encodedBody;
+
+    if (body == null) {
+      encodedBody = null;
+    } else if (body is Map<String, dynamic> || body is Map<String, String>) {
+      encodedBody = jsonEncode(body);
+    } else {
+      encodedBody = jsonEncode(body.toJson());
+    }
+
+    print('📤 [HTTP $method] $url');
+    print('🧾 Body enviado: $encodedBody');
+    print('🧵 Headers: $headers');
+
     switch (method) {
       case 'POST':
-        return http.post(
-          url,
-          headers: headers,
-          body: jsonEncode(body?.toJson()),
-        );
+        return http.post(url, headers: headers, body: encodedBody);
       case 'PUT':
-        return http.put(
-          url,
-          headers: headers,
-          body: jsonEncode(body?.toJson()),
-        );
+        return http.put(url, headers: headers, body: encodedBody);
       case 'PATCH':
-        return http.patch(
-          url,
-          headers: headers,
-          body: jsonEncode(body?.toJson()),
-        );
+        return http.patch(url, headers: headers, body: encodedBody);
       case 'DELETE':
         return http.delete(url, headers: headers);
       case 'GET':
