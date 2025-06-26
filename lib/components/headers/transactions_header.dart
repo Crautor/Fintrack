@@ -31,24 +31,20 @@ class TransactionsHeader extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(20, 11, 20, 20),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Stack(
+                alignment: Alignment.center,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/main');
-                    },
-                  ),
-                  const Text(
-                    'Transações',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0E3E3E),
+                  const Center(
+                    child: Text(
+                      'Transações',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0E3E3E),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  const Positioned(right: 0, child: SizedBox(width: 48)),
                 ],
               ),
               const SizedBox(height: 24),

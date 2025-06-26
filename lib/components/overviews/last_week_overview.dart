@@ -79,7 +79,7 @@ class LastWeekOverview extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            "Renda na\nSemana Passada",
+                            "Renda na\nSemana\nPassada",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
@@ -118,7 +118,7 @@ class LastWeekOverview extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            "Despesas na\nSemana Passada",
+                            "Despesas na\nSemana\nPassada",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black,

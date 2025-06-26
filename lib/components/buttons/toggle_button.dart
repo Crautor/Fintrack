@@ -21,7 +21,7 @@ class ToggleButton extends StatelessWidget {
       selectedColor: Colors.white,
       fillColor: const Color(0xFF00D084),
       color: Colors.black87,
-      constraints: const BoxConstraints(minWidth: 90, minHeight: 40),
+      constraints: const BoxConstraints(minWidth: 78, minHeight: 40),
       children:
           toggleLabels
               .map((label) => Text(label, style: const TextStyle(fontSize: 16)))

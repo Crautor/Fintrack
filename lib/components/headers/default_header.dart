@@ -39,31 +39,25 @@ class DefaultHeader extends StatelessWidget {
                     ? CrossAxisAlignment.center
                     : CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Stack(
+                alignment: Alignment.center,
                 children: [
                   if (isBackButtonVisible)
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: onBack ?? () => Navigator.pop(context),
-                    )
-                  else
-                    const SizedBox(width: 20),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: onBack ?? () => Navigator.pop(context),
+                      ),
+                    ),
 
-                  Expanded(
+                  Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment:
-                          isBackButtonVisible
-                              ? CrossAxisAlignment.center
-                              : CrossAxisAlignment.start,
                       children: [
                         Text(
                           title,
-                          textAlign:
-                              isBackButtonVisible
-                                  ? TextAlign.center
-                                  : TextAlign.left,
+                          textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -86,10 +80,14 @@ class DefaultHeader extends StatelessWidget {
                     ),
                   ),
 
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [if (extraActions != null) ...extraActions!],
-                  ),
+                  if (extraActions != null)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: extraActions!,
+                      ),
+                    ),
                 ],
               ),
 
