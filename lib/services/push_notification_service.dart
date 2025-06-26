@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fintrack/services/request_service.dart';
+import 'package:fintrack/models/Notifications/RegisterTokenRequest.dart';
 
 class PushNotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -38,29 +39,36 @@ class PushNotificationService {
   }
 
   static Future<void> registerTokenOnBackend(String token) async {
+    print('🔄 [PushService] Iniciando registro de token...');
+    print('📲 Token recebido: $token');
+
     try {
-      // Busca o user-mail do storage seguro
       final storage = const FlutterSecureStorage();
       final userEmail = await storage.read(key: 'user-mail');
+
       if (userEmail == null) {
-        print('⚠️ Usuário não autenticado, não foi possível registrar o token');
+        print('⚠️ [PushService] user-mail não encontrado no storage.');
         return;
       }
-      // final url = Uri.parse(
-      //   'http://localhost:3000/api/notifications/tokens/registrar?email=$userEmail',
-      // );
+
+      print('📧 user-mail recuperado: $userEmail');
+      final payload = RegisterTokenRequest(token: token);
+      print('📦 Corpo enviado: ${payload.toJson()}');
+
       final response = await RequestService.post<void>(
         'notifications/tokens/registrar?email=$userEmail',
-        {'token': token},
+        payload,
         (_) => null,
       );
+
+      print('📡 Status da resposta: ${response.statusCode}');
       if (response.statusCode == 200) {
         print('✅ Token registrado com sucesso no backend!');
       } else {
-        print('⚠️ Falha ao registrar token no backend: ${response}');
+        print('⚠️ Falha ao registrar token no backend: ${response.statusCode}');
       }
     } catch (e) {
-      print('❌ Erro ao enviar token: \\${e.toString()}');
+      print('❌ Erro ao enviar token: ${e.toString()}');
     }
   }
 }
