@@ -46,7 +46,7 @@ class GoalSummaryCard extends StatelessWidget {
                   children: const [
                     Icon(Icons.savings_outlined, size: 14),
                     SizedBox(width: 4),
-                    Text("Quantia poupada:", style: TextStyle(fontSize: 14)),
+                    Text("Quantia\npoupada:", style: TextStyle(fontSize: 14)),
                   ],
                 ),
                 Text(

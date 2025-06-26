@@ -255,7 +255,7 @@ class _DashboardPageState extends State<DashboardPage> with RouteAware {
                               onCalendarPressed: widget.onCalendarPressed,
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 10),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
