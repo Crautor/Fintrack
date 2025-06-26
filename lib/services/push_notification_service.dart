@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fintrack/services/request_service.dart';
@@ -9,10 +7,8 @@ class PushNotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
   static Future<void> initialize() async {
-    // Solicita permissão para receber notificações (necessário para iOS)
     await _messaging.requestPermission();
 
-    // Obtém o token do dispositivo (pode ser enviado ao backend)
     final token = await _messaging.getToken();
     print('FCM Token: $token');
     if (token != null) {
@@ -25,16 +21,12 @@ class PushNotificationService {
       await registerTokenOnBackend(newToken);
     });
 
-    // Manipula mensagens recebidas em foreground
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Mensagem recebida em foreground: ${message.notification?.title}');
-      // Aqui você pode exibir um dialog/toast/local notification
     });
 
-    // Manipula mensagens quando o app é aberto por uma notificação
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('App aberto por notificação: ${message.notification?.title}');
-      // Aqui você pode navegar para uma tela específica
     });
   }
 

@@ -140,6 +140,10 @@ class RequestService {
       encodedBody = jsonEncode(body.toJson());
     }
 
+    print('📤 [HTTP $method] $url');
+    print('🧾 Body enviado: $encodedBody');
+    print('🧵 Headers: $headers');
+
     switch (method) {
       case 'POST':
         return http.post(url, headers: headers, body: encodedBody);

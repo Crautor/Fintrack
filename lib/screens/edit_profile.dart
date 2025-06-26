@@ -80,6 +80,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 IconButton(
                                   icon: const Icon(
@@ -88,7 +89,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   ),
                                   onPressed: () => Navigator.of(context).pop(),
                                 ),
-                                const Spacer(),
                                 const Text(
                                   'Editar Perfil',
                                   style: TextStyle(
@@ -97,17 +97,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const Spacer(),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.notifications_none,
-                                    color: Colors.white,
-                                  ),
-                                  onPressed: () {},
-                                ),
+                                const SizedBox(width: 48),
                               ],
                             ),
                           ),
+
                           const SizedBox(height: 10),
                           Container(
                             height: 80,
@@ -273,5 +267,4 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     );
   }
-
 }

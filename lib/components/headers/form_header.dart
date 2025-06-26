@@ -35,24 +35,7 @@ class FormHeader extends StatelessWidget {
                   color: Color(0xFF0E3E3E),
                 ),
               ),
-              Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.notifications_none,
-                    color: Color(0xFF093030),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/notifications');
-                  },
-                  splashRadius: 20,
-                ),
-              ),
+              const SizedBox(width: 48),
             ],
           ),
         ),
